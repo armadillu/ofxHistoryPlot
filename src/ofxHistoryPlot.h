@@ -38,6 +38,7 @@ class ofxHistoryPlot: public ofBaseDraws{
 		void setRespectBorders(bool respect){respectBorders = respect;}
 		void setDrawSkipVal(int skip){ drawSkip = skip; if (drawSkip <1) drawSkip = 1;} //draw evey n samples, might speed up drawing 
 		void setLineWidth(float w){ lineWidth = w;}
+		void setDrawBackground(bool d) { drawBackground = d;}
 		void reset();
 		
 	private:
@@ -49,6 +50,8 @@ class ofxHistoryPlot: public ofBaseDraws{
 		float			lowest, highest;
 		bool			manualRange;
 		bool			onlyLowestIsFixed;
+	
+		bool			drawBackground;
 
 		bool			autoUpdate;
 		bool			showNumericalInfo;
