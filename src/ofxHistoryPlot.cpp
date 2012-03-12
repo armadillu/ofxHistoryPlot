@@ -32,6 +32,7 @@ ofxHistoryPlot::ofxHistoryPlot(float * val, string varName, float maxHistory, bo
 	drawSkip = 1;
 	showNumericalInfo = true;
 	respectBorders = true;
+	drawBackground = true;
 }
 
 
@@ -89,10 +90,13 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 	bool haveData = true;
 	if (values.size() == 0 ) haveData = false;
 	
-
+	#ifndef TARGET_OPENGLES	
 	glPushAttrib(GL_CURRENT_BIT);
-		glColor4f(0,0,0,0.9);
-		ofRect(x, y, w, h);		
+	#endif
+		if (drawBackground){
+			glColor4f(0,0,0,0.9);
+			ofRect(x, y, w, h);		
+		}
 		if ( showNumericalInfo && haveData){
 			glColor4f(0.7,0.7,0.7,1);
 			float cVal = values[values.size()-1];
@@ -103,18 +107,24 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 		ofDrawBitmapString(ofToString(highest, precision), 1 + x , y + 10);
 		ofDrawBitmapString(ofToString(lowest, precision), 1 + x , y + h - 1);
 		
+	#ifndef TARGET_OPENGLES	
 	glPopAttrib();
+	#endif
 	
 	if (haveData){
 		ofNoFill();
 
+		#ifndef TARGET_OPENGLES	
 		glPushAttrib(GL_ENABLE_BIT);
+		#endif
 		glEnable(GL_LINE_SMOOTH);
-		glLineWidth(lineWidth);
+		ofSetLineWidth(lineWidth);
 		glHint (GL_LINE_SMOOTH_HINT, GL_FASTEST);
 
 			if (colorSet){
+				#ifndef TARGET_OPENGLES	
 				glPushAttrib(GL_CURRENT_BIT);
+				#endif
 				glColor4ub(lineColor.r, lineColor.g, lineColor.b, lineColor.a);
 			}
 			ofBeginShape();
@@ -132,9 +142,10 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 
 			ofEndShape(false);
 
+		#ifndef TARGET_OPENGLES	
 			if (colorSet) glPopAttrib();
-
 		glPopAttrib();
+		#endif
 
 		ofFill();
 	}
