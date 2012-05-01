@@ -51,19 +51,22 @@ void ofxHistoryPlot::update(float newVal){
 		newVal = *valf;	
 	
 	if ( ( manualRange && onlyLowestIsFixed ) || !manualRange ){	//update graph range every now and then
-		int skip = 2;
-		//if (!autoUpdate) skip = 1;	//if not doing this too fast, no need to skip range processing
-		if ( count%skip == 0 ){			
-			if (!onlyLowestIsFixed) lowest = FLT_MAX;
-			highest = -FLT_MIN;
-			for (int i = 0; i < values.size(); i+=skip){
-				float val = values[i];
-				if (val > highest) highest = val;
-				if (!onlyLowestIsFixed) if (val < lowest) lowest = val;
-			}	
-			if (lowest == FLT_MAX) lowest = -1;
-			if (highest == -FLT_MIN) highest = 1;
-		}
+//		int skip = 1;
+//		//if (!autoUpdate) skip = 1;	//if not doing this too fast, no need to skip range processing
+//		if ( count%skip == 0 ){			
+//			if (!onlyLowestIsFixed) lowest = FLT_MAX;
+//			highest = -FLT_MIN;
+//			for (int i = 0; i < values.size(); i+=skip){
+//				float val = values[i];
+//				if (val > highest) highest = val;
+//				if (!onlyLowestIsFixed) if (val < lowest) lowest = val;
+//			}	
+//			if (lowest == FLT_MAX) lowest = -1;
+//			if (highest == -FLT_MIN) highest = 1;
+//		}
+		
+		if ( newVal > highest) highest = newVal;
+		if ( newVal < lowest) lowest = newVal;
 	}
 	
 	values.push_back( float( newVal) );
