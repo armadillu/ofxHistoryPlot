@@ -97,7 +97,7 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 	glPushAttrib(GL_CURRENT_BIT);
 	#endif
 		if (drawBackground){
-			glColor4f(0,0,0,0.9);
+			glColor4f(0,0,0,0.75);
 			ofRect(x, y, w, h);		
 		}
 		if ( showNumericalInfo && haveData){
