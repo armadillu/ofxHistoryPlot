@@ -33,6 +33,7 @@ ofxHistoryPlot::ofxHistoryPlot(float * val, string varName, float maxHistory, bo
 	showNumericalInfo = true;
 	respectBorders = true;
 	drawBackground = true;
+	bgColor = ofColor(0);
 }
 
 
@@ -97,7 +98,7 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 	glPushAttrib(GL_CURRENT_BIT);
 	#endif
 		if (drawBackground){
-			glColor4f(0,0,0,0.75);
+			ofSetColor(bgColor);
 			ofRect(x, y, w, h);		
 		}
 		if ( showNumericalInfo && haveData){

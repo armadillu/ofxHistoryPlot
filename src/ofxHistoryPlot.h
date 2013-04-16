@@ -34,6 +34,7 @@ class ofxHistoryPlot: public ofBaseDraws{
 		float getHeight(){ return DEFAULT_HEIGHT;}
 		float getWidth(){ return DEFAULT_WIDTH;}
 		void setColor(ofColor c){ colorSet = true; lineColor = c;}
+		void setBackgroundColor(ofColor c){ bgColor = c;}
 		void setShowNumericalInfo(bool show){ showNumericalInfo = show;}	
 		void setRespectBorders(bool respect){respectBorders = respect;}
 		void setDrawSkipVal(int skip){ drawSkip = skip; if (drawSkip <1) drawSkip = 1;} //draw evey n samples, might speed up drawing 
@@ -67,6 +68,7 @@ class ofxHistoryPlot: public ofBaseDraws{
 	
 		bool			colorSet;
 		ofColor			lineColor;
+		ofColor			bgColor;
 			
 		int				drawSkip;
 		float			lineWidth;
