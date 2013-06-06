@@ -30,6 +30,7 @@ class ofxHistoryPlot: public ofBaseDraws{
 		void draw(int x, int y );
 		void setRange(float low, float high);	//range is manual
 		void setLowerRange(float low);	//low is fixed, high is auto
+		void setMaxHistory(int max);
 		void setPrecision(int prec){ precision = ofClamp(precision, 0, 15); }	//number of decimals to show
 		float getHeight(){ return DEFAULT_HEIGHT;}
 		float getWidth(){ return DEFAULT_WIDTH;}

@@ -36,6 +36,9 @@ ofxHistoryPlot::ofxHistoryPlot(float * val, string varName, float maxHistory, bo
 	bgColor = ofColor(0);
 }
 
+void ofxHistoryPlot::setMaxHistory(int max){
+	MAX_HISTORY = max;
+}
 
 void ofxHistoryPlot::reset(){
 
