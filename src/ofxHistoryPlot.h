@@ -36,15 +36,20 @@ class ofxHistoryPlot: public ofBaseDraws{
 		float getWidth(){ return DEFAULT_WIDTH;}
 		void setColor(ofColor c){ colorSet = true; lineColor = c;}
 		void setBackgroundColor(ofColor c){ bgColor = c;}
+		void setGridColor(ofColor c){ gridColor = c;}
 		void setShowNumericalInfo(bool show){ showNumericalInfo = show;}	
 		void setRespectBorders(bool respect){respectBorders = respect;}
 		void setDrawSkipVal(int skip){ drawSkip = skip; if (drawSkip <1) drawSkip = 1;} //draw evey n samples, might speed up drawing 
 		void setLineWidth(float w){ lineWidth = w;}
 		void setDrawBackground(bool d) { drawBackground = d;}
+		void setDrawGrid(bool d) { drawGrid = d;}
 		void reset();
 		
 	private:
-	
+
+		void refillGridMesh(float x, float y , float w, float h);
+		void refillPlotMesh(float x, float y , float w, float h);
+
 		string			varName;
 		float *			valf;
 	
@@ -58,7 +63,8 @@ class ofxHistoryPlot: public ofBaseDraws{
 		bool			autoUpdate;
 		bool			showNumericalInfo;
 		bool			respectBorders;
-	
+		bool			drawGrid;
+
 		int				MAX_HISTORY;
 		int				index;
 		int				addedCounter;
@@ -70,7 +76,15 @@ class ofxHistoryPlot: public ofBaseDraws{
 		bool			colorSet;
 		ofColor			lineColor;
 		ofColor			bgColor;
+		ofColor			gridColor;
 			
 		int				drawSkip;
 		float			lineWidth;
+
+		bool plotNeedsRefresh;
+
+		ofMesh gridMesh;
+		ofMesh plotMesh;
+
+		ofRectangle prevRect;
 };

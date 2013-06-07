@@ -34,6 +34,11 @@ ofxHistoryPlot::ofxHistoryPlot(float * val, string varName, float maxHistory, bo
 	respectBorders = true;
 	drawBackground = true;
 	bgColor = ofColor(0);
+	gridColor = ofColor(255,16);
+	drawGrid = true;
+	plotNeedsRefresh = true;
+	gridMesh.setMode(OF_PRIMITIVE_LINES);
+	plotMesh.setMode(OF_PRIMITIVE_LINE_STRIP);
 }
 
 void ofxHistoryPlot::setMaxHistory(int max){
@@ -77,7 +82,8 @@ void ofxHistoryPlot::update(float newVal){
 	if (values.size() > MAX_HISTORY){
 		values.erase( values.begin() );
 	}
-	
+
+	plotNeedsRefresh = true;
 //	float adapt = 0.05;
 //	lowest = lowest + adapt * (newVal - lowest);
 //	highest = highest - adapt * (highest - newVal);
@@ -91,7 +97,51 @@ void ofxHistoryPlot::draw(int x, int y){
 	draw((float)x,(float)y,DEFAULT_WIDTH,DEFAULT_HEIGHT);
 }
 
+void ofxHistoryPlot::refillGridMesh(float x, float y , float w, float h){
+
+	gridMesh.clear();
+	int gridH = 40;
+	float numLinesH = h / gridH;
+	gridMesh.setMode(OF_PRIMITIVE_LINES);
+	for(int i = 0; i < numLinesH; i++){
+		gridMesh.addVertex( ofVec2f(x, gridH/2 + y + gridH * i) );
+		gridMesh.addVertex( ofVec2f(x + w, gridH/2 + y + gridH * i) );
+	}
+	float numLinesW = w / gridH;
+	for(int i = 0; i < numLinesW; i++){
+		gridMesh.addVertex( ofVec2f( gridH/2 + x + gridH * i, y ) );
+		gridMesh.addVertex( ofVec2f( gridH/2 + x + gridH * i, y + h) );
+	}
+
+}
+
+
+void ofxHistoryPlot::refillPlotMesh(float x, float y , float w, float h){
+
+	plotMesh.clear();
+	float border = respectBorders ? 12 : 0;
+	int start = 0;
+	if (count >= MAX_HISTORY){
+		start = drawSkip - (count) % (drawSkip);
+	}
+
+	for (int i =  start; i < values.size(); i+= drawSkip){
+		float xx = ofMap(i, 0, MAX_HISTORY, 0, w, false);
+		float yy = ofMap( values[i], lowest-0.001, highest+0.001, border, h - border, true);
+		plotMesh.addVertex(ofVec3f(x + xx, y + h - yy));
+	}
+}
+
+
 void ofxHistoryPlot::draw(float x, float y , float w, float h){
+
+	bool needsMesh = false;
+	ofRectangle r = ofRectangle(x,y,w,h);
+	if ( r != prevRect || autoUpdate || plotNeedsRefresh){
+		needsMesh = true;
+		plotNeedsRefresh = false;
+		cout << "aaa" << endl;
+	}
 
 	if (autoUpdate) update();
 	bool haveData = true;
@@ -102,7 +152,22 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 	#endif
 		if (drawBackground){
 			ofSetColor(bgColor);
-			ofRect(x, y, w, h);		
+			ofRect(x, y, w, h);
+			if (drawGrid){
+				if(needsMesh){
+					refillGridMesh(x, y, w, h);
+				}
+				
+				ofSetColor(gridColor);
+				#ifndef TARGET_OPENGLES
+				glPushAttrib(GL_ENABLE_BIT);
+				#endif
+				ofSetLineWidth(1);
+				gridMesh.draw();
+				#ifndef TARGET_OPENGLES
+				glPopAttrib();
+				#endif
+			}
 		}
 		if ( showNumericalInfo && haveData){
 			glColor4f(0.7,0.7,0.7,1);
@@ -134,28 +199,21 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 				#endif
 				glColor4ub(lineColor.r, lineColor.g, lineColor.b, lineColor.a);
 			}
-			ofBeginShape();
-				float border = respectBorders ? 12 : 0;			
-				int start = 0;
-				if (count >= MAX_HISTORY){
-					start = drawSkip - (count) % (drawSkip);
-				}
 
-				for (int i =  start; i < values.size(); i+= drawSkip){
-					float xx = ofMap(i, 0, MAX_HISTORY, 0, w, false);
-					float yy = ofMap( values[i], lowest-0.001, highest+0.001, border, h - border, true);
-					ofVertex( x + xx, y + h - yy);		
-				}
+			if(needsMesh){
+				refillPlotMesh(x, y, w, h);
+			}
 
-			ofEndShape(false);
+			plotMesh.draw();
 
-		#ifndef TARGET_OPENGLES	
+		#ifndef TARGET_OPENGLES
 			if (colorSet) glPopAttrib();
 		glPopAttrib();
 		#endif
 
 		ofFill();
 	}
+	prevRect = r;
 }
 
 
