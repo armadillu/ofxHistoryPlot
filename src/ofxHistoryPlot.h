@@ -43,6 +43,7 @@ class ofxHistoryPlot: public ofBaseDraws{
 		void setLineWidth(float w){ lineWidth = w;}
 		void setDrawBackground(bool d) { drawBackground = d;}
 		void setDrawGrid(bool d) { drawGrid = d;}
+		void setGridUnit(float g){gridUnit = g;}
 		void reset();
 		
 	private:
@@ -80,6 +81,7 @@ class ofxHistoryPlot: public ofBaseDraws{
 			
 		int				drawSkip;
 		float			lineWidth;
+	float			gridUnit;
 
 		bool plotNeedsRefresh;
 
