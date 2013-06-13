@@ -172,9 +172,11 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 			string text = varName + " " + ofToString(cVal, precision);
 			ofDrawBitmapString(text, x + w - (text.length()) * 8  , y + 10);
 		}
-		glColor4f(0.33,0.33,0.33, 1);
-		ofDrawBitmapString(ofToString(highest, precision), 1 + x , y + 10);
-		ofDrawBitmapString(ofToString(lowest, precision), 1 + x , y + h - 1);
+		if ( showNumericalInfo ){
+			glColor4f(0.33,0.33,0.33, 1);
+			ofDrawBitmapString(ofToString(highest, precision), 1 + x , y + 10);
+			ofDrawBitmapString(ofToString(lowest, precision), 1 + x , y + h - 1);
+		}
 		
 	#ifndef TARGET_OPENGLES	
 	glPopAttrib();
