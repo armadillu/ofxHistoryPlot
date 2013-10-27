@@ -36,6 +36,7 @@ ofxHistoryPlot::ofxHistoryPlot(float * val, string varName, float maxHistory, bo
 	bgColor = ofColor(0);
 	gridColor = ofColor(255,16);
 	drawGrid = true;
+	shrinkBackInAutoRange = false;
 	plotNeedsRefresh = true;
 	gridMesh.setMode(OF_PRIMITIVE_LINES);
 	plotMesh.setMode(OF_PRIMITIVE_LINE_STRIP);
@@ -60,20 +61,21 @@ void ofxHistoryPlot::update(float newVal){
 		newVal = *valf;	
 	
 	if ( ( manualRange && onlyLowestIsFixed ) || !manualRange ){	//update graph range every now and then
-//		int skip = 1;
-//		//if (!autoUpdate) skip = 1;	//if not doing this too fast, no need to skip range processing
-//		if ( count%skip == 0 ){			
-//			if (!onlyLowestIsFixed) lowest = FLT_MAX;
-//			highest = -FLT_MIN;
-//			for (int i = 0; i < values.size(); i+=skip){
-//				float val = values[i];
-//				if (val > highest) highest = val;
-//				if (!onlyLowestIsFixed) if (val < lowest) lowest = val;
-//			}	
-//			if (lowest == FLT_MAX) lowest = -1;
-//			if (highest == -FLT_MIN) highest = 1;
-//		}
-		
+		int skip = 3;
+		if(shrinkBackInAutoRange){
+			//if (!autoUpdate) skip = 1;	//if not doing this too fast, no need to skip range processing
+			if ( count%skip == 0 ){			
+				if (!onlyLowestIsFixed) lowest = FLT_MAX;
+				highest = -FLT_MIN;
+				for (int i = 0; i < values.size(); i+=skip){
+					float val = values[i];
+					if (val > highest) highest = val;
+					if (!onlyLowestIsFixed) if (val < lowest) lowest = val;
+				}	
+				if (lowest == FLT_MAX) lowest = -1;
+				if (highest == -FLT_MIN) highest = 1;
+			}
+		}
 		if ( newVal > highest) highest = newVal;
 		if ( newVal < lowest) lowest = newVal;
 	}
@@ -100,14 +102,14 @@ void ofxHistoryPlot::draw(int x, int y){
 void ofxHistoryPlot::refillGridMesh(float x, float y , float w, float h){
 
 	gridMesh.clear();
-	int gridH = gridUnit;
-	float numLinesH = -1 + h / gridH;
+	float gridH = gridUnit;
+	float numLinesH = h / gridH;
 	gridMesh.setMode(OF_PRIMITIVE_LINES);
 	for(int i = 0; i < numLinesH; i++){
-		gridMesh.addVertex( ofVec2f(x, gridH/2 + y + gridH * i) );
-		gridMesh.addVertex( ofVec2f(x + w, gridH/2 + y + gridH * i) );
+		gridMesh.addVertex( ofVec2f(x,  y + gridH * i) );
+		gridMesh.addVertex( ofVec2f(x + w,  y + gridH * i) );
 	}
-	float numLinesW = -1 + w / gridH;
+	float numLinesW = w / gridH;
 	for(int i = 0; i < numLinesW; i++){
 		gridMesh.addVertex( ofVec2f( gridH/2 + x + gridH * i, y ) );
 		gridMesh.addVertex( ofVec2f( gridH/2 + x + gridH * i, y + h) );

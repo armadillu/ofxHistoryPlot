@@ -31,7 +31,7 @@ class ofxHistoryPlot: public ofBaseDraws{
 		void setRange(float low, float high);	//range is manual
 		void setLowerRange(float low);	//low is fixed, high is auto
 		void setMaxHistory(int max);
-		void setPrecision(int prec){ precision = ofClamp(precision, 0, 15); }	//number of decimals to show
+		void setPrecision(int prec){ precision = ofClamp(prec, 0, 15); }	//number of decimals to show
 		float getHeight(){ return DEFAULT_HEIGHT;}
 		float getWidth(){ return DEFAULT_WIDTH;}
 		void setColor(ofColor c){ colorSet = true; lineColor = c;}
@@ -43,7 +43,8 @@ class ofxHistoryPlot: public ofBaseDraws{
 		void setLineWidth(float w){ lineWidth = w;}
 		void setDrawBackground(bool d) { drawBackground = d;}
 		void setDrawGrid(bool d) { drawGrid = d;}
-		void setGridUnit(float g){gridUnit = g;}
+		void setGridUnit(float g){gridUnit = g;} //pixels
+		void setAutoRangeShrinksBack(bool shrink){shrinkBackInAutoRange = shrink;};
 		void reset();
 		
 	private:
@@ -65,6 +66,7 @@ class ofxHistoryPlot: public ofBaseDraws{
 		bool			showNumericalInfo;
 		bool			respectBorders;
 		bool			drawGrid;
+		bool			shrinkBackInAutoRange;
 
 		int				MAX_HISTORY;
 		int				index;
