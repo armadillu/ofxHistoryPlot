@@ -77,7 +77,7 @@ void ofxHistoryPlot::update(float newVal){
 			}
 		}
 		if ( newVal > highest) highest = newVal;
-		if ( newVal < lowest) lowest = newVal;
+		if ( newVal < lowest && !onlyLowestIsFixed) lowest = newVal;
 	}
 	
 	values.push_back( float( newVal) );
