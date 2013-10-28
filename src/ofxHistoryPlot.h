@@ -46,6 +46,8 @@ class ofxHistoryPlot: public ofBaseDraws{
 		void setGridUnit(float g){gridUnit = g;} //pixels
 		void setAutoRangeShrinksBack(bool shrink){shrinkBackInAutoRange = shrink;};
 		void reset();
+		float getLowerRange();
+		float getHigerRange();
 		
 	private:
 

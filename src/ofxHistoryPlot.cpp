@@ -226,6 +226,16 @@ void ofxHistoryPlot::setRange(float low, float high){
 	highest = high;
 }
 
+float ofxHistoryPlot::getLowerRange(){
+	return lowest;
+}
+
+
+float ofxHistoryPlot::getHigerRange(){
+	return highest;
+}
+
+
 void ofxHistoryPlot::setLowerRange(float low){
 	
 	manualRange = true;
