@@ -228,7 +228,11 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 				#ifndef TARGET_OPENGLES
 				glPushAttrib(GL_CURRENT_BIT);
 				#endif
-				glColor4ub(lineColor.r, lineColor.g, lineColor.b, lineColor.a / 3);
+				if(showSmoothedPlot){
+					glColor4ub(lineColor.r, lineColor.g, lineColor.b, lineColor.a / 3);
+				}else{
+					glColor4ub(lineColor.r, lineColor.g, lineColor.b, lineColor.a);
+				}
 			}
 
 			plotMesh.draw();
