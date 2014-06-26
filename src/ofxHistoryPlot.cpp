@@ -40,7 +40,11 @@ ofxHistoryPlot::ofxHistoryPlot(float * val, string varName, float maxHistory, bo
 	plotNeedsRefresh = true;
 	gridMesh.setMode(OF_PRIMITIVE_LINES);
 	plotMesh.setMode(OF_PRIMITIVE_LINE_STRIP);
+	smoothPlotMesh.setMode(OF_PRIMITIVE_LINE_STRIP);
 	gridUnit = 40;
+	smoothFactor = 0.1;
+	smoothValue = 0;
+	showSmoothedPlot = false;
 }
 
 void ofxHistoryPlot::setMaxHistory(int max){
@@ -54,7 +58,11 @@ void ofxHistoryPlot::reset(){
 
 
 void ofxHistoryPlot::update(float newVal){
-	
+
+	if (count <= 1){
+		smoothValue = newVal;
+	}
+
 	count++;
 	
 	if (newVal != newVal && valf != NULL)	//if no value is supplied (default value NAN), use the float* we were given..
@@ -79,10 +87,22 @@ void ofxHistoryPlot::update(float newVal){
 		if ( newVal > highest) highest = newVal;
 		if ( newVal < lowest && !onlyLowestIsFixed) lowest = newVal;
 	}
-	
-	values.push_back( float( newVal) );
+
+	values.push_back(newVal);
+
+	if(showSmoothedPlot) {
+		smoothValue = newVal * smoothFactor + smoothValue * (1.0f - smoothFactor);
+		smoothValues.push_back(smoothValue);
+	}
+
 	if (values.size() > MAX_HISTORY){
 		values.erase( values.begin() );
+	}
+
+	if(showSmoothedPlot) {
+		if (smoothValues.size() > MAX_HISTORY){
+			smoothValues.erase( smoothValues.begin() );
+		}
 	}
 
 	plotNeedsRefresh = true;
@@ -111,25 +131,28 @@ void ofxHistoryPlot::refillGridMesh(float x, float y , float w, float h){
 	}
 	float numLinesW = w / gridH;
 	for(int i = 0; i < numLinesW; i++){
-		gridMesh.addVertex( ofVec2f( gridH/2 + x + gridH * i, y ) );
-		gridMesh.addVertex( ofVec2f( gridH/2 + x + gridH * i, y + h) );
+		gridMesh.addVertex( ofVec2f( gridH * 0.5 + x + gridH * i, y ) );
+		gridMesh.addVertex( ofVec2f( gridH * 0.5 + x + gridH * i, y + h) );
 	}
 }
 
 
-void ofxHistoryPlot::refillPlotMesh(float x, float y , float w, float h){
+void ofxHistoryPlot::refillPlotMesh(ofMesh& mesh, vector<float> & vals, float x, float y , float w, float h){
 
-	plotMesh.clear();
+	mesh.clear();
 	float border = respectBorders ? 12 : 0;
 	int start = 0;
 	if (count >= MAX_HISTORY){
 		start = drawSkip - (count) % (drawSkip);
 	}
 
-	for (int i =  start; i < values.size(); i+= drawSkip){
+	float loww = lowest - 0.001f;
+	float highh = highest + 0.001f;
+
+	for (int i =  start; i < vals.size(); i+= drawSkip){
 		float xx = ofMap(i, 0, MAX_HISTORY, 0, w, false);
-		float yy = ofMap( values[i], lowest-0.001, highest+0.001, border, h - border, true);
-		plotMesh.addVertex(ofVec3f(x + xx, y + h - yy));
+		float yy = ofMap( vals[i], loww, highh, border, h - border, true);
+		mesh.addVertex(ofVec3f(x + xx, y + h - yy));
 	}
 }
 
@@ -194,18 +217,28 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 		ofSetLineWidth(lineWidth);
 		glHint (GL_LINE_SMOOTH_HINT, GL_FASTEST);
 
-			if (colorSet){
-				#ifndef TARGET_OPENGLES	
-				glPushAttrib(GL_CURRENT_BIT);
-				#endif
-				glColor4ub(lineColor.r, lineColor.g, lineColor.b, lineColor.a);
+			if(needsMesh){
+				refillPlotMesh(plotMesh, values, x, y, w, h);
+				if (showSmoothedPlot){
+					refillPlotMesh(smoothPlotMesh, smoothValues, x, y, w, h);
+				}
 			}
 
-			if(needsMesh){
-				refillPlotMesh(x, y, w, h);
+			if (colorSet){
+				#ifndef TARGET_OPENGLES
+				glPushAttrib(GL_CURRENT_BIT);
+				#endif
+				glColor4ub(lineColor.r, lineColor.g, lineColor.b, lineColor.a / 3);
 			}
 
 			plotMesh.draw();
+			if (showSmoothedPlot){
+				if (colorSet){
+					glColor4ub(lineColor.r, lineColor.g, lineColor.b, lineColor.a);
+				}
+
+				smoothPlotMesh.draw();
+			}
 
 		#ifndef TARGET_OPENGLES
 			if (colorSet) glPopAttrib();

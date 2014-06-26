@@ -48,16 +48,20 @@ class ofxHistoryPlot: public ofBaseDraws{
 		void reset();
 		float getLowerRange();
 		float getHigerRange();
+		void setShowSmoothedCurve(bool show){showSmoothedPlot = show;}
+		void setSmoothFilter(float filter){smoothFactor = filter;};
 		
 	private:
 
 		void refillGridMesh(float x, float y , float w, float h);
-		void refillPlotMesh(float x, float y , float w, float h);
+		void refillPlotMesh(ofMesh& mesh, vector<float> & vals, float x, float y , float w, float h);
 
 		string			varName;
 		float *			valf;
 	
 		vector<float>	values;
+		vector<float>	smoothValues;
+
 		float			lowest, highest;
 		bool			manualRange;
 		bool			onlyLowestIsFixed;
@@ -85,12 +89,17 @@ class ofxHistoryPlot: public ofBaseDraws{
 			
 		int				drawSkip;
 		float			lineWidth;
-	float			gridUnit;
+		float			gridUnit;
+
+		bool			showSmoothedPlot;
+		float			smoothValue; //average of the last plotted vals
+		float			smoothFactor; //(0 1.0] >> 1.0 means no smoothing
 
 		bool plotNeedsRefresh;
 
 		ofMesh gridMesh;
 		ofMesh plotMesh;
+		ofMesh smoothPlotMesh;
 
 		ofRectangle prevRect;
 };
