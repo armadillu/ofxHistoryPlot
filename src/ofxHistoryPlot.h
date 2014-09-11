@@ -16,7 +16,7 @@
 #define DEFAULT_WIDTH	160.0f
 #define DEFAULT_HEIGHT	120.0f
 
-class ofxHistoryPlot: public ofBaseDraws{
+class ofxHistoryPlot{
 
 	public :
 
