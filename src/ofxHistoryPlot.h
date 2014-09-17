@@ -30,6 +30,10 @@ class ofxHistoryPlot{
 		void draw(int x, int y );
 		void setRange(float low, float high);	//range is manual
 		void setLowerRange(float low);	//low is fixed, high is auto
+
+		void addHorizontalGuide(float yval, ofColor c);
+		void clearHorizontalGuides();
+
 		void setMaxHistory(int max);
 		void setPrecision(int prec){ precision = ofClamp(prec, 0, 15); }	//number of decimals to show
 		float getHeight(){ return DEFAULT_HEIGHT;}
@@ -54,13 +58,16 @@ class ofxHistoryPlot{
 	private:
 
 		void refillGridMesh(float x, float y , float w, float h);
-		void refillPlotMesh(ofMesh& mesh, vector<float> & vals, float x, float y , float w, float h);
+		void refillPlotMesh(ofVboMesh& mesh, vector<float> & vals, float x, float y , float w, float h);
 
 		string			varName;
 		float *			valf;
 	
 		vector<float>	values;
 		vector<float>	smoothValues;
+
+		vector<float>	horizontalGuides;
+		vector<ofColor>	horizontalGuideColors;
 
 		float			lowest, highest;
 		bool			manualRange;
@@ -97,9 +104,9 @@ class ofxHistoryPlot{
 
 		bool plotNeedsRefresh;
 
-		ofMesh gridMesh;
-		ofMesh plotMesh;
-		ofMesh smoothPlotMesh;
+		ofVboMesh gridMesh;
+		ofVboMesh plotMesh;
+		ofVboMesh smoothPlotMesh;
 
 		ofRectangle prevRect;
 };

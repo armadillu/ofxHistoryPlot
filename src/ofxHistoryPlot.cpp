@@ -69,7 +69,7 @@ void ofxHistoryPlot::update(float newVal){
 		newVal = *valf;	
 	
 	if ( ( manualRange && onlyLowestIsFixed ) || !manualRange ){	//update graph range every now and then
-		int skip = 3;
+		int skip = 1;
 		if(shrinkBackInAutoRange){
 			//if (!autoUpdate) skip = 1;	//if not doing this too fast, no need to skip range processing
 			if ( count%skip == 0 ){			
@@ -137,7 +137,7 @@ void ofxHistoryPlot::refillGridMesh(float x, float y , float w, float h){
 }
 
 
-void ofxHistoryPlot::refillPlotMesh(ofMesh& mesh, vector<float> & vals, float x, float y , float w, float h){
+void ofxHistoryPlot::refillPlotMesh(ofVboMesh& mesh, vector<float> & vals, float x, float y , float w, float h){
 
 	mesh.clear();
 	float border = respectBorders ? 12 : 0;
@@ -154,6 +154,20 @@ void ofxHistoryPlot::refillPlotMesh(ofMesh& mesh, vector<float> & vals, float x,
 		float yy = ofMap( vals[i], loww, highh, border, h - border, true);
 		mesh.addVertex(ofVec3f(x + xx, y + h - yy));
 	}
+}
+
+
+void ofxHistoryPlot::addHorizontalGuide(float yval, ofColor c){
+	horizontalGuides.push_back(yval);
+	plotNeedsRefresh = true;
+	horizontalGuideColors.push_back(c);
+}
+
+
+void ofxHistoryPlot::clearHorizontalGuides(){
+	horizontalGuides.clear();
+	plotNeedsRefresh = true;
+	horizontalGuideColors.clear();
 }
 
 
@@ -202,6 +216,18 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 			ofDrawBitmapString(ofToString(highest, precision), 1 + x , y + 10);
 			ofDrawBitmapString(ofToString(lowest, precision), 1 + x , y + h - 1);
 		}
+
+		for(int i = 0; i < horizontalGuides.size(); i++){
+			float myY = horizontalGuides[i];
+			if (myY > lowest && myY < highest){ //TODO negative!
+				float yy = ofMap( myY, lowest, highest, 0, h, true);
+				ofSetColor(horizontalGuideColors[i] * 0.33);
+				ofDrawBitmapString(ofToString(horizontalGuides[i], precision), 10 * i + x, y + h - yy + 10 );
+				ofSetColor(horizontalGuideColors[i] );
+				ofLine( x, y + h - yy, x + w, y + h - yy );
+			}
+		}
+
 		
 	#ifndef TARGET_OPENGLES	
 	glPopAttrib();
