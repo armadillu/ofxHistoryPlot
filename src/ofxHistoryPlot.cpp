@@ -123,7 +123,7 @@ void ofxHistoryPlot::refillGridMesh(float x, float y , float w, float h){
 
 	gridMesh.clear();
 	int gridH = gridUnit;
-	int numLinesH = h / gridH;
+	float numLinesH = h / gridH;
 	gridMesh.setMode(OF_PRIMITIVE_LINES);
 	for(int i = 0; i < numLinesH; i++){
 		gridMesh.addVertex( ofVec2f(x,  y + gridH * i) );
