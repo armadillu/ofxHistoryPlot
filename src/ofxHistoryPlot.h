@@ -7,11 +7,11 @@
  *
  */
 
-#pragma once
+#ifndef OFX_HISTORY_PLOT_DEFINED
+#define OFX_HISTORY_PLOT_DEFINED
 
 #include "ofMain.h"
 #include <limits>
-
 
 #define DEFAULT_WIDTH	160.0f
 #define DEFAULT_HEIGHT	120.0f
@@ -110,3 +110,5 @@ class ofxHistoryPlot{
 
 		ofRectangle prevRect;
 };
+
+#endif
