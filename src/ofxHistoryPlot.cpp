@@ -221,9 +221,9 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 			float myY = horizontalGuides[i];
 			if (myY > lowest && myY < highest){ //TODO negative!
 				float yy = ofMap( myY, lowest, highest, 0, h, true);
-				ofSetColor(horizontalGuideColors[i], 100);
+				ofSetColor(horizontalGuideColors[i], 50);
 				ofDrawBitmapString(ofToString(horizontalGuides[i], precision), 10 * i + x, y + h - yy + 10 );
-				ofSetColor(horizontalGuideColors[i], 128 );
+				ofSetColor(horizontalGuideColors[i], 64 );
 				ofLine( x, y + h - yy, x + w, y + h - yy );
 			}
 		}
