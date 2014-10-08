@@ -199,7 +199,9 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 				glPushAttrib(GL_ENABLE_BIT);
 				#endif
 				ofSetLineWidth(1);
+				ofDisableAntiAliasing();
 				gridMesh.draw();
+				ofEnableAntiAliasing();
 				#ifndef TARGET_OPENGLES
 				glPopAttrib();
 				#endif
