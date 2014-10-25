@@ -10,29 +10,29 @@ void testApp::setup(){
 	ofBackground(22, 22, 22, 255);
 
 	mouseIsPressed = false;
-	int numSamples = 500;
+	int numSamples = 350;
 	
-	plot = new ofxHistoryPlot( NULL, "mouseY manual update", numSamples, false); //NULL cos we don't want it to auto-update. confirmed by "true"
+	plot = new ofxHistoryPlot( NULL, "mouseY", numSamples, false); //NULL cos we don't want it to auto-update. confirmed by "true"
 	plot->setRange(0, ofGetHeight()); //hard range, will not adapt to values off-scale
-	plot->addHorizontalGuide(ofGetHeight()/2, ofColor(255,0,0)); //add custom reference guides
-	plot->setColor( ofColor(255,0,0) ); //color of the plot line
+	//plot->addHorizontalGuide(ofGetHeight()/2, ofColor(255,0,0)); //add custom reference guides
+	plot->setColor( ofColor(0,255,0) ); //color of the plot line
 	plot->setShowNumericalInfo(true);  //show the current value and the scale in the plot
-	plot->setRespectBorders(true);	   //
-	plot->setLineWidth(2);				//plot line width
+	plot->setRespectBorders(true);	   //dont let the plot draw on top of text
+	plot->setLineWidth(1);				//plot line width
 	plot->setBackgroundColor(ofColor(0,220)); //custom bg color
 	//custom grid setup
 	plot->setDrawGrid(true);
-	plot->setGridColor(ofColor(20,255)); //grid lines color
-	plot->setGridUnit(16);
+	plot->setGridColor(ofColor(30)); //grid lines color
+	plot->setGridUnit(14);
 
 
 	plot2 = new ofxHistoryPlot( &currentFrameRate, "currentFrameRate auto updated", numSamples, true);	//true for autoupdate
 	//plot2->setLowerRange(0); //set only the lowest part of the range upper is adaptative to curve
 	plot2->setAutoRangeShrinksBack(true); //plot scale can shrink back after growing if plot curves requires it
-	plot2->setColor( ofColor(0,255,0) );
+	plot2->setColor( ofColor(255,0,255) );
 	plot2->setShowNumericalInfo(true);
 	plot2->setRespectBorders(true);
-	plot2->setLineWidth(2);
+	plot2->setLineWidth(1);
 
 	plot2->setShowSmoothedCurve(true); //plot a smoothed version of the values, but alos the original in lesser alpha
 	plot2->setSmoothFilter(0.1); //smooth filter strength
