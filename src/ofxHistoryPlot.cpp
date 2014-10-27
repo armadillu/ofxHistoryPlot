@@ -27,7 +27,6 @@ ofxHistoryPlot::ofxHistoryPlot(float * val, string varName, float maxHistory, bo
 	onlyLowestIsFixed = false;
 	count = 1;
 	precision = 2;
-	colorSet = false;
 	lineWidth = 1.0f;
 	drawSkip = 1;
 	showNumericalInfo = true;
@@ -45,6 +44,7 @@ ofxHistoryPlot::ofxHistoryPlot(float * val, string varName, float maxHistory, bo
 	smoothFactor = 0.1;
 	smoothValue = 0;
 	showSmoothedPlot = false;
+	lineColor = ofColor(255,0,0);
 }
 
 void ofxHistoryPlot::setMaxHistory(int max){
@@ -180,13 +180,11 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 		plotNeedsRefresh = false;
 	}
 
+	ofPushStyle();
 	if (autoUpdate) update();
 	bool haveData = true;
 	if (values.size() == 0 ) haveData = false;
 	
-	#ifndef TARGET_OPENGLES	
-	glPushAttrib(GL_CURRENT_BIT);
-	#endif
 		if (drawBackground){
 			ofSetColor(bgColor);
 			ofRect(x, y, w, h);
@@ -195,26 +193,20 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 					refillGridMesh(x, y, w, h);
 				}
 				ofSetColor(gridColor);
-				#ifndef TARGET_OPENGLES
-				glPushAttrib(GL_ENABLE_BIT);
-				#endif
 				ofSetLineWidth(1);
 				ofDisableAntiAliasing();
 				gridMesh.draw();
 				ofEnableAntiAliasing();
-				#ifndef TARGET_OPENGLES
-				glPopAttrib();
-				#endif
 			}
 		}
 		if ( showNumericalInfo && haveData){
-			glColor4f(0.7,0.7,0.7,1);
+			ofSetColor(180);
 			float cVal = values[values.size()-1];
 			string text = varName + " " + ofToString(cVal, precision);
 			ofDrawBitmapString(text, x + w - (text.length()) * 8  , y + 10);
 		}
 		if ( showNumericalInfo ){
-			glColor4f(0.33,0.33,0.33, 1);
+			ofSetColor(85);
 			ofDrawBitmapString(ofToString(highest, precision), 1 + x , y + 10);
 			ofDrawBitmapString(ofToString(lowest, precision), 1 + x , y + h - 1);
 		}
@@ -230,20 +222,11 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 			}
 		}
 
-		
-	#ifndef TARGET_OPENGLES	
-	glPopAttrib();
-	#endif
-	
+
 	if (haveData){
 		ofNoFill();
 
-		#ifndef TARGET_OPENGLES	
-		glPushAttrib(GL_ENABLE_BIT);
-		#endif
-		glEnable(GL_LINE_SMOOTH);
 		ofSetLineWidth(lineWidth);
-		glHint (GL_LINE_SMOOTH_HINT, GL_FASTEST);
 
 			if(needsMesh){
 				refillPlotMesh(plotMesh, values, x, y, w, h);
@@ -252,33 +235,20 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 				}
 			}
 
-			if (colorSet){
-				#ifndef TARGET_OPENGLES
-				glPushAttrib(GL_CURRENT_BIT);
-				#endif
-				if(showSmoothedPlot){
-					glColor4ub(lineColor.r, lineColor.g, lineColor.b, lineColor.a / 3);
-				}else{
-					glColor4ub(lineColor.r, lineColor.g, lineColor.b, lineColor.a);
-				}
+			if(showSmoothedPlot){
+				ofSetColor(lineColor.r, lineColor.g, lineColor.b, lineColor.a / 3);
+			}else{
+				ofSetColor(lineColor.r, lineColor.g, lineColor.b, lineColor.a);
 			}
 
 			plotMesh.draw();
 			if (showSmoothedPlot){
-				if (colorSet){
-					glColor4ub(lineColor.r, lineColor.g, lineColor.b, lineColor.a);
-				}
-
+				ofSetColor(lineColor.r, lineColor.g, lineColor.b, lineColor.a);
 				smoothPlotMesh.draw();
 			}
-
-		#ifndef TARGET_OPENGLES
-			if (colorSet) glPopAttrib();
-		glPopAttrib();
-		#endif
-
 		ofFill();
 	}
+	ofPopStyle();
 	prevRect = r;
 }
 
