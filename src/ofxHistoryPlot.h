@@ -49,6 +49,7 @@ class ofxHistoryPlot{
 		void setDrawGrid(bool d) { drawGrid = d;}
 		void setGridUnit(float g){gridUnit = g;} //pixels
 		void setAutoRangeShrinksBack(bool shrink){shrinkBackInAutoRange = shrink;};
+		void setDrawFromRight(bool val); //begin drawing graph from right instead of left
 		void reset();
 		float getLowerRange();
 		float getHigerRange();
@@ -81,6 +82,7 @@ class ofxHistoryPlot{
 		bool			respectBorders;
 		bool			drawGrid;
 		bool			shrinkBackInAutoRange;
+		bool			drawFromRight; //begin drawing graph from right instead of left
 
 		int				MAX_HISTORY;
 		int				index;

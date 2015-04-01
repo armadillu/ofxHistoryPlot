@@ -45,6 +45,7 @@ ofxHistoryPlot::ofxHistoryPlot(float * val, string varName, float maxHistory, bo
 	smoothValue = 0;
 	showSmoothedPlot = false;
 	lineColor = ofColor(255,0,0);
+	drawFromRight = false;
 }
 
 void ofxHistoryPlot::setMaxHistory(int max){
@@ -149,8 +150,14 @@ void ofxHistoryPlot::refillPlotMesh(ofVboMesh& mesh, vector<float> & vals, float
 	float loww = lowest - 0.001f;
 	float highh = highest + 0.001f;
 
+	float offset = 0;
+	float curMaxX = MAX_HISTORY;
+	if (drawFromRight && vals.size() < MAX_HISTORY) {
+		offset = w - vals.size() * w / MAX_HISTORY;
+		curMaxX = vals.size();
+	}
 	for (int i =  start; i < vals.size(); i+= drawSkip){
-		float xx = ofMap(i, 0, MAX_HISTORY, 0, w, false);
+		float xx = ofMap(i, 0, curMaxX, offset, w, false);
 		float yy = ofMap( vals[i], loww, highh, border, h - border, true);
 		mesh.addVertex(ofVec3f(x + xx, y + h - yy));
 	}
@@ -259,6 +266,10 @@ void ofxHistoryPlot::setRange(float low, float high){
 	onlyLowestIsFixed = false;
 	lowest = low;
 	highest = high;
+}
+
+void ofxHistoryPlot::setDrawFromRight(bool _val) {
+	drawFromRight = _val;
 }
 
 float ofxHistoryPlot::getLowerRange(){
