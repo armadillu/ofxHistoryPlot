@@ -38,7 +38,10 @@ class ofxHistoryPlot{
 		void setPrecision(int prec){ precision = ofClamp(prec, 0, 15); }	//number of decimals to show
 		float getHeight(){ return DEFAULT_HEIGHT;}
 		float getWidth(){ return DEFAULT_WIDTH;}
+
 		void setColor(ofColor c){ lineColor = c;}
+		ofColor getColor(){return lineColor;}
+
 		void setBackgroundColor(ofColor c){ bgColor = c;}
 		void setGridColor(ofColor c){ gridColor = c;}
 		void setShowNumericalInfo(bool show){ showNumericalInfo = show;}	

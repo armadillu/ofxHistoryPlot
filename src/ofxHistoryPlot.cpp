@@ -96,12 +96,12 @@ void ofxHistoryPlot::update(float newVal){
 		smoothValues.push_back(smoothValue);
 	}
 
-	if (values.size() > MAX_HISTORY){
+	while (values.size() > MAX_HISTORY){
 		values.erase( values.begin() );
 	}
 
 	if(showSmoothedPlot) {
-		if (smoothValues.size() > MAX_HISTORY){
+		while (smoothValues.size() > MAX_HISTORY){
 			smoothValues.erase( smoothValues.begin() );
 		}
 	}
@@ -207,7 +207,7 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 			}
 		}
 		if ( showNumericalInfo && haveData){
-			ofSetColor(180);
+			ofSetColor(lineColor);
 			float cVal = values[values.size()-1];
 			string text = varName + " " + ofToString(cVal, precision);
 			ofDrawBitmapString(text, x + w - (text.length()) * 8  , y + 10);
