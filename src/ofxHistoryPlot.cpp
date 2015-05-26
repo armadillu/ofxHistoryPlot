@@ -288,3 +288,9 @@ void ofxHistoryPlot::setLowerRange(float low){
 	onlyLowestIsFixed = true;
 	lowest = low;
 }
+
+
+
+string ofxHistoryPlot::getVariableName(){
+    return varName;
+};

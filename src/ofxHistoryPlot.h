@@ -59,6 +59,8 @@ class ofxHistoryPlot{
 		void setShowSmoothedCurve(bool show){showSmoothedPlot = show;}
 		void setSmoothFilter(float filter){smoothFactor = filter;};
 		vector<float> getValues(){ return values; }
+    
+        string getVariableName();
 
 	private:
 
