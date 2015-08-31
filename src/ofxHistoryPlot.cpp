@@ -138,7 +138,7 @@ void ofxHistoryPlot::refillGridMesh(float x, float y , float w, float h){
 }
 
 
-void ofxHistoryPlot::refillPlotMesh(ofVboMesh& mesh, vector<float> & vals, float x, float y , float w, float h){
+void ofxHistoryPlot::refillPlotMesh(ofVboMesh& mesh, deque<float> & vals, float x, float y , float w, float h){
 
 	mesh.clear();
 	float border = respectBorders ? 12 : 0;

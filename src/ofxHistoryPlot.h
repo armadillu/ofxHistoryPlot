@@ -58,20 +58,20 @@ class ofxHistoryPlot{
 		float getHigerRange();
 		void setShowSmoothedCurve(bool show){showSmoothedPlot = show;}
 		void setSmoothFilter(float filter){smoothFactor = filter;};
-		vector<float> getValues(){ return values; }
+		deque<float>& getValues(){ return values; }
     
         string getVariableName();
 
 	private:
 
 		void refillGridMesh(float x, float y , float w, float h);
-		void refillPlotMesh(ofVboMesh& mesh, vector<float> & vals, float x, float y , float w, float h);
+		void refillPlotMesh(ofVboMesh& mesh, deque<float> & vals, float x, float y , float w, float h);
 
 		string			varName;
 		float *			valf;
 	
-		vector<float>	values;
-		vector<float>	smoothValues;
+		deque<float>	values;
+		deque<float>	smoothValues;
 
 		vector<float>	horizontalGuides;
 		vector<ofColor>	horizontalGuideColors;
