@@ -206,12 +206,11 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 				ofEnableAntiAliasing();
 			}
 		}
-		if ( showNumericalInfo && haveData){
-			ofSetColor(lineColor);
-			float cVal = values[values.size()-1];
-			string text = varName + " " + ofToString(cVal, precision);
-			ofDrawBitmapString(text, x + w - (text.length()) * 8  , y + 10);
-		}
+		ofSetColor(lineColor);
+		float cVal;
+		if(haveData) cVal = *values.rbegin();
+		string text = varName + string(haveData ? (" " + ofToString(cVal, precision)) : "");
+		ofDrawBitmapString(text, x + w - (text.length()) * 8  , y + 10);
 		if ( showNumericalInfo ){
 			ofSetColor(85);
 			ofDrawBitmapString(ofToString(highest, precision), 1 + x , y + 10);
@@ -243,7 +242,7 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 			}
 
 			if(showSmoothedPlot){
-				ofSetColor(lineColor.r * 0.15, lineColor.g * 0.15, lineColor.b * 0.15, lineColor.a);
+				ofSetColor(lineColor.r * 0.25, lineColor.g * 0.25, lineColor.b * 0.25, lineColor.a);
 			}else{
 				ofSetColor(lineColor.r, lineColor.g, lineColor.b, lineColor.a);
 			}
