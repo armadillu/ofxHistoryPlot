@@ -56,13 +56,14 @@ void ofxHistoryPlot::setMaxHistory(int max){
 
 void ofxHistoryPlot::reset(){
 	values.clear();
+	smoothValues.clear();
 	count = 0;
 }
 
 
 void ofxHistoryPlot::update(float newVal){
 
-	if (count <= 1){
+	if (count <= 1 && newVal == newVal/*nan filter*/){
 		smoothValue = newVal;
 	}
 
@@ -71,7 +72,7 @@ void ofxHistoryPlot::update(float newVal){
 	if (newVal != newVal && valf != NULL)	//if no value is supplied (default value NAN), use the float* we were given..
 		newVal = *valf;	
 	
-	int skip = 1;
+	int skip = 3;
 	if(shrinkBackInAutoRange){
 		//if (!autoUpdate) skip = 1;	//if not doing this too fast, no need to skip range processing
 		if ( count%skip == 0 ){			
@@ -245,7 +246,7 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 			float plotValuesRange = highest - lowest;
 			float yscale = (h-1) / plotValuesRange;
 			if(drawFromRight){
-				ofTranslate(w, 0);
+				ofTranslate(w *(float(values.size()) / MAX_HISTORY), 0);
 				ofScale(-1,1);
 			}
 			ofScale(w / MAX_HISTORY, -yscale );

@@ -14,7 +14,7 @@ void testApp::setup(){
 	
 	plot = new ofxHistoryPlot( NULL, "mouseY", numSamples, false); //NULL cos we don't want it to auto-update. confirmed by "true"
 	plot->setRange(0, ofGetHeight()); //hard range, will not adapt to values off-scale
-	//plot->addHorizontalGuide(ofGetHeight()/2, ofColor(255,0,0)); //add custom reference guides
+	plot->addHorizontalGuide(ofGetHeight()/2, ofColor(255,0,0)); //add custom reference guides
 	plot->setColor( ofColor(0,255,0) ); //color of the plot line
 	plot->setShowNumericalInfo(true);  //show the current value and the scale in the plot
 	plot->setRespectBorders(true);	   //dont let the plot draw on top of text
