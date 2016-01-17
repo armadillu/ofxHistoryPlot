@@ -33,6 +33,7 @@ void testApp::setup(){
 	plot2->setShowNumericalInfo(true);
 	plot2->setRespectBorders(true);
 	plot2->setLineWidth(1);
+	plot2->setDrawFromRight(true);
 
 	plot2->setShowSmoothedCurve(true); //plot a smoothed version of the values, but alos the original in lesser alpha
 	plot2->setSmoothFilter(0.1); //smooth filter strength

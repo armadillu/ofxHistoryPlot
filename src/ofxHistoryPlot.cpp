@@ -244,6 +244,10 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 			ofTranslate(x,y + h + (respectBorders ? 12 : 0) - 1);
 			float plotValuesRange = highest - lowest;
 			float yscale = (h-1) / plotValuesRange;
+			if(drawFromRight){
+				ofTranslate(w, 0);
+				ofScale(-1,1);
+			}
 			ofScale(w / MAX_HISTORY, -yscale );
 			ofTranslate(0, -lowest);
 			plotMesh.draw();
