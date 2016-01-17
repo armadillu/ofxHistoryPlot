@@ -246,7 +246,7 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 			float plotValuesRange = highest - lowest;
 			float yscale = (h-1) / plotValuesRange;
 			if(drawFromRight){
-				ofTranslate(w *(float(values.size()) / MAX_HISTORY), 0);
+				ofTranslate(w , 0);
 				ofScale(-1,1);
 			}
 			ofScale(w / MAX_HISTORY, -yscale );
