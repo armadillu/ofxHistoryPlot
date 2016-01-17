@@ -49,6 +49,7 @@ class ofxHistoryPlot{
 		void setDrawSkipVal(int skip){ drawSkip = skip; if (drawSkip <1) drawSkip = 1;} //draw evey n samples, might speed up drawing 
 		void setLineWidth(float w){ lineWidth = w;}
 		void setDrawBackground(bool d) { drawBackground = d;}
+		void setDrawTitle(bool doit){drawTitle = doit;}
 		void setDrawGrid(bool d) { drawGrid = d;}
 		void setGridUnit(float g){gridUnit = g;} //pixels
 		void setAutoRangeShrinksBack(bool shrink){shrinkBackInAutoRange = shrink;};
@@ -88,6 +89,7 @@ class ofxHistoryPlot{
 		bool			drawGrid;
 		bool			shrinkBackInAutoRange;
 		bool			drawFromRight; //begin drawing graph from right instead of left
+		bool			drawTitle;
 
 		int				MAX_HISTORY;
 		int				index;

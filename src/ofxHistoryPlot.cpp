@@ -31,6 +31,7 @@ ofxHistoryPlot::ofxHistoryPlot(float * val, string varName, float maxHistory, bo
 	drawSkip = 1;
 	showNumericalInfo = true;
 	respectBorders = true;
+	drawTitle = true;
 	drawBackground = true;
 	bgColor = ofColor(0);
 	gridColor = ofColor(255,16);
@@ -39,6 +40,7 @@ ofxHistoryPlot::ofxHistoryPlot(float * val, string varName, float maxHistory, bo
 	plotNeedsRefresh = true;
 	gridMesh.setMode(OF_PRIMITIVE_LINES);
 	plotMesh.setMode(OF_PRIMITIVE_LINE_STRIP);
+	plotMesh.getVertices().reserve(MAX_HISTORY * 2);
 	smoothPlotMesh.setMode(OF_PRIMITIVE_LINE_STRIP);
 	gridUnit = 40;
 	smoothFactor = 0.1;
@@ -69,25 +71,23 @@ void ofxHistoryPlot::update(float newVal){
 	if (newVal != newVal && valf != NULL)	//if no value is supplied (default value NAN), use the float* we were given..
 		newVal = *valf;	
 	
-	if ( ( manualRange && onlyLowestIsFixed ) || !manualRange ){	//update graph range every now and then
-		int skip = 1;
-		if(shrinkBackInAutoRange){
-			//if (!autoUpdate) skip = 1;	//if not doing this too fast, no need to skip range processing
-			if ( count%skip == 0 ){			
-				if (!onlyLowestIsFixed) lowest = FLT_MAX;
-				highest = -FLT_MIN;
-				for (int i = 0; i < values.size(); i+=skip){
-					float val = values[i];
-					if (val > highest) highest = val;
-					if (!onlyLowestIsFixed) if (val < lowest) lowest = val;
-				}	
-				if (lowest == FLT_MAX) lowest = -1;
-				if (highest == -FLT_MIN) highest = 1;
-			}
+	int skip = 1;
+	if(shrinkBackInAutoRange){
+		//if (!autoUpdate) skip = 1;	//if not doing this too fast, no need to skip range processing
+		if ( count%skip == 0 ){			
+			if (!onlyLowestIsFixed) lowest = FLT_MAX;
+			highest = -FLT_MIN;
+			for (int i = 0; i < values.size(); i+=skip){
+				float val = values[i];
+				if (val > highest) highest = val;
+				if (!onlyLowestIsFixed) if (val < lowest) lowest = val;
+			}	
+			if (lowest == FLT_MAX) lowest = -1;
+			if (highest == -FLT_MIN) highest = 1;
 		}
-		if ( newVal > highest) highest = newVal;
-		if ( newVal < lowest && !onlyLowestIsFixed) lowest = newVal;
 	}
+	if ( newVal > highest) highest = newVal;
+	if ( newVal < lowest && !onlyLowestIsFixed) lowest = newVal;
 
 	values.push_back(newVal);
 
@@ -141,25 +141,13 @@ void ofxHistoryPlot::refillGridMesh(float x, float y , float w, float h){
 void ofxHistoryPlot::refillPlotMesh(ofVboMesh& mesh, deque<float> & vals, float x, float y , float w, float h){
 
 	mesh.clear();
-	float border = respectBorders ? 12 : 0;
 	int start = 0;
 	if (count >= MAX_HISTORY){
 		start = drawSkip - (count) % (drawSkip);
 	}
 
-	float loww = lowest - 0.001f;
-	float highh = highest + 0.001f;
-
-	float offset = 0;
-	float curMaxX = MAX_HISTORY;
-	if (drawFromRight && vals.size() < MAX_HISTORY) {
-		offset = w - vals.size() * w / MAX_HISTORY;
-		curMaxX = vals.size();
-	}
 	for (int i =  start; i < vals.size(); i+= drawSkip){
-		float xx = ofMap(i, 0, curMaxX, offset, w, false);
-		float yy = ofMap( vals[i], loww, highh, border, h - border, true);
-		mesh.addVertex(ofVec3f(x + xx, y + h - yy));
+		mesh.addVertex(ofVec3f(i, vals[i]));
 	}
 }
 
@@ -191,42 +179,44 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 	if (autoUpdate) update();
 	bool haveData = true;
 	if (values.size() == 0 ) haveData = false;
-	
-		if (drawBackground){
-			ofSetColor(bgColor);
-			ofRect(x, y, w, h);
-			if (drawGrid){
-				if(needsMesh){
-					refillGridMesh(x, y, w, h);
-				}
-				ofSetColor(gridColor);
-				ofSetLineWidth(1);
-				ofDisableAntiAliasing();
-				gridMesh.draw();
-				ofEnableAntiAliasing();
+
+	if (drawBackground){
+		ofSetColor(bgColor);
+		ofRect(x, y, w, h);
+		if (drawGrid){
+			if(needsMesh){
+				refillGridMesh(x, y, w, h);
 			}
+			ofSetColor(gridColor);
+			ofSetLineWidth(1);
+			ofDisableAntiAliasing();
+			gridMesh.draw();
+			ofEnableAntiAliasing();
 		}
-		ofSetColor(lineColor);
-		float cVal;
-		if(haveData) cVal = *values.rbegin();
+	}
+	ofSetColor(lineColor);
+	float cVal;
+	if(haveData) cVal = *values.rbegin();
+	if(drawTitle){
 		string text = varName + string(haveData ? (" " + ofToString(cVal, precision)) : "");
 		ofDrawBitmapString(text, x + w - (text.length()) * 8  , y + 10);
-		if ( showNumericalInfo ){
-			ofSetColor(85);
-			ofDrawBitmapString(ofToString(highest, precision), 1 + x , y + 10);
-			ofDrawBitmapString(ofToString(lowest, precision), 1 + x , y + h - 1);
-		}
+	}
+	if ( showNumericalInfo ){
+		ofSetColor(85);
+		ofDrawBitmapString(ofToString(highest, precision), 1 + x , y + 10);
+		ofDrawBitmapString(ofToString(lowest, precision), 1 + x , y + h - 1);
+	}
 
-		for(int i = 0; i < horizontalGuides.size(); i++){
-			float myY = horizontalGuides[i];
-			if (myY > lowest && myY < highest){ //TODO negative!
-				float yy = ofMap( myY, lowest, highest, 0, h, true);
-				ofSetColor(horizontalGuideColors[i], 50);
-				ofDrawBitmapString(ofToString(horizontalGuides[i], precision), 10 + x, y + h - yy + 10 );
-				ofSetColor(horizontalGuideColors[i], 64 );
-				ofLine( x, y + h - yy, x + w, y + h - yy );
-			}
+	for(int i = 0; i < horizontalGuides.size(); i++){
+		float myY = horizontalGuides[i];
+		if (myY > lowest && myY < highest){ //TODO negative!
+			float yy = ofMap( myY, lowest, highest, 0, h, true);
+			ofSetColor(horizontalGuideColors[i], 50);
+			ofDrawBitmapString(ofToString(horizontalGuides[i], precision), 10 + x, y + h - yy + 10 );
+			ofSetColor(horizontalGuideColors[i], 64 );
+			ofLine( x, y + h - yy, x + w, y + h - yy );
 		}
+	}
 
 
 	if (haveData){
@@ -247,11 +237,22 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 				ofSetColor(lineColor.r, lineColor.g, lineColor.b, lineColor.a);
 			}
 
+			ofPushMatrix();
+			glEnable(GL_SCISSOR_TEST);
+			glScissor(x, ofGetHeight() -y -h, w, h);
+			if (respectBorders) h -= 12;
+			ofTranslate(x,y + h + (respectBorders ? 12 : 0) - 1);
+			float plotValuesRange = highest - lowest;
+			float yscale = (h-1) / plotValuesRange;
+			ofScale(w / MAX_HISTORY, -yscale );
+			ofTranslate(0, -lowest);
 			plotMesh.draw();
 			if (showSmoothedPlot){
 				ofSetColor(lineColor.r, lineColor.g, lineColor.b, lineColor.a);
 				smoothPlotMesh.draw();
 			}
+			glDisable(GL_SCISSOR_TEST);
+			ofPopMatrix();
 		ofFill();
 	}
 	ofPopStyle();
@@ -282,7 +283,6 @@ float ofxHistoryPlot::getHigerRange(){
 
 
 void ofxHistoryPlot::setLowerRange(float low){
-	
 	manualRange = true;
 	onlyLowestIsFixed = true;
 	lowest = low;
