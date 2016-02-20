@@ -74,7 +74,7 @@ void ofxHistoryPlot::update(float newVal){
 		newVal = *valf;	
 	
 	int skip = 3;
-	if(shrinkBackInAutoRange){
+	if((!manualRange || onlyLowestIsFixed) && shrinkBackInAutoRange){
 		//if (!autoUpdate) skip = 1;	//if not doing this too fast, no need to skip range processing
 		if ( count%skip == 0 ){			
 			if (!onlyLowestIsFixed) lowest = FLT_MAX;
@@ -88,8 +88,10 @@ void ofxHistoryPlot::update(float newVal){
 			if (highest == -FLT_MIN) highest = 1;
 		}
 	}
-	if ( newVal > highest) highest = newVal;
-	if ( newVal < lowest && !onlyLowestIsFixed) lowest = newVal;
+	if(!manualRange){
+		if ( newVal > highest) highest = newVal;
+		if ( newVal < lowest && !onlyLowestIsFixed) lowest = newVal;
+	}
 
 	values.push_back(newVal);
 
@@ -109,9 +111,6 @@ void ofxHistoryPlot::update(float newVal){
 	}
 
 	plotNeedsRefresh = true;
-//	float adapt = 0.05;
-//	lowest = lowest + adapt * (newVal - lowest);
-//	highest = highest - adapt * (highest - newVal);
 }
 
 void ofxHistoryPlot::draw(float x, float y){
@@ -273,7 +272,6 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 
 
 void ofxHistoryPlot::setRange(float low, float high){
-
 	manualRange = true;
 	onlyLowestIsFixed = false;
 	lowest = low;
