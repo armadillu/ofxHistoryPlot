@@ -46,6 +46,7 @@ ofxHistoryPlot::ofxHistoryPlot(float * val, string varName, float maxHistory, bo
 	smoothFactor = 0.1;
 	smoothValue = 0;
 	showSmoothedPlot = false;
+	scissor = false;
 	lineColor = ofColor(255,0,0);
 	drawFromRight = false;
 }
@@ -176,6 +177,8 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 		plotNeedsRefresh = false;
 	}
 
+	bool needsGrid = r != prevRect;
+
 	ofPushStyle();
 	if (autoUpdate) update();
 	bool haveData = true;
@@ -185,7 +188,7 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 		ofSetColor(bgColor);
 		ofRect(x, y, w, h);
 		if (drawGrid){
-			if(needsMesh){
+			if(needsGrid){
 				refillGridMesh(x, y, w, h);
 			}
 			ofSetColor(gridColor);
@@ -239,8 +242,10 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 			}
 
 			ofPushMatrix();
-			glEnable(GL_SCISSOR_TEST);
-			glScissor(x, ofGetHeight() -y -h, w, h);
+			if(scissor){
+				glEnable(GL_SCISSOR_TEST);
+				glScissor(x, ofGetHeight() -y -h, w, h);
+			}
 			if (respectBorders) h -= 12;
 			ofTranslate(x,y + h + (respectBorders ? 12 : 0) - 1);
 			float plotValuesRange = highest - lowest;
@@ -256,7 +261,9 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 				ofSetColor(lineColor.r, lineColor.g, lineColor.b, lineColor.a);
 				smoothPlotMesh.draw();
 			}
-			glDisable(GL_SCISSOR_TEST);
+			if(scissor){
+				glDisable(GL_SCISSOR_TEST);
+			}
 			ofPopMatrix();
 		ofFill();
 	}

@@ -59,6 +59,8 @@ class ofxHistoryPlot{
 		float getHigerRange();
 		void setShowSmoothedCurve(bool show){showSmoothedPlot = show;}
 		void setSmoothFilter(float filter){smoothFactor = filter;};
+		void setScissorTest(bool s){scissor = s;}
+
 		deque<float>& getValues(){ return values; }
     
         string getVariableName();
@@ -90,6 +92,7 @@ class ofxHistoryPlot{
 		bool			shrinkBackInAutoRange;
 		bool			drawFromRight; //begin drawing graph from right instead of left
 		bool			drawTitle;
+		bool			scissor;
 
 		int				MAX_HISTORY;
 		int				index;
