@@ -30,6 +30,7 @@ class ofxHistoryPlot{
 		void draw(int x, int y );
 		void setRange(float low, float high);	//range is manual
 		void setLowerRange(float low);	//low is fixed, high is auto
+		void setRangeAuto();
 
 		void addHorizontalGuide(float yval, ofColor c);
 		void clearHorizontalGuides();
@@ -57,6 +58,9 @@ class ofxHistoryPlot{
 		void reset();
 		float getLowerRange();
 		float getHigerRange();
+		float getLowestValue();
+		float getHigestValue();
+
 		void setShowSmoothedCurve(bool show){showSmoothedPlot = show;}
 		void setSmoothFilter(float filter){smoothFactor = filter;};
 		void setCropToRect(bool s){scissor = s;}

@@ -277,6 +277,10 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 }
 
 
+void ofxHistoryPlot::setRangeAuto(){
+	rangeMode = RANGE_AUTOMATIC;
+}
+
 void ofxHistoryPlot::setRange(float low, float high){
 	rangeMode = RANGE_MANUAL;
 	manualLowest = low;
@@ -288,18 +292,36 @@ void ofxHistoryPlot::setDrawFromRight(bool _val) {
 }
 
 float ofxHistoryPlot::getLowerRange(){
-	return lowest;
+	switch (rangeMode) {
+		case RANGE_MANUAL: return manualLowest;
+		case RANGE_LOWER_FIXED: return manualLowest;
+		case RANGE_AUTOMATIC: return lowest;
+	}
+	return -1.0;
 }
 
 
 float ofxHistoryPlot::getHigerRange(){
-	return highest;
+	switch (rangeMode) {
+		case RANGE_MANUAL: return manualHighest;
+		case RANGE_LOWER_FIXED: return highest;
+		case RANGE_AUTOMATIC: return highest;
+	}
+	return 1.0;
 }
 
 
 void ofxHistoryPlot::setLowerRange(float low){
 	rangeMode = RANGE_LOWER_FIXED;
 	lowest = low;
+}
+
+float ofxHistoryPlot::getLowestValue(){
+	return lowest;
+}
+
+float ofxHistoryPlot::getHigestValue(){
+	return highest;
 }
 
 
