@@ -59,7 +59,7 @@ class ofxHistoryPlot{
 		float getHigerRange();
 		void setShowSmoothedCurve(bool show){showSmoothedPlot = show;}
 		void setSmoothFilter(float filter){smoothFactor = filter;};
-		void setScissorTest(bool s){scissor = s;}
+		void setCropToRect(bool s){scissor = s;}
 
 		deque<float>& getValues(){ return values; }
     

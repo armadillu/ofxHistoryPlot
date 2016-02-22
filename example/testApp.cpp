@@ -24,6 +24,7 @@ void testApp::setup(){
 	plot->setDrawGrid(true);
 	plot->setGridColor(ofColor(30)); //grid lines color
 	plot->setGridUnit(14);
+	plot->setCropToRect(true);
 
 
 	plot2 = new ofxHistoryPlot( &currentFrameRate, "currentFrameRate auto updated", numSamples, true);	//true for autoupdate
@@ -37,7 +38,7 @@ void testApp::setup(){
 
 	plot2->setShowSmoothedCurve(true); //plot a smoothed version of the values, but alos the original in lesser alpha
 	plot2->setSmoothFilter(0.1); //smooth filter strength
-
+	plot2->setCropToRect(true);
 	plot2->update(0);
 
 }
