@@ -23,8 +23,7 @@ ofxHistoryPlot::ofxHistoryPlot(float * val, string varName, float maxHistory, bo
 		highest = 1;
 	}
 	MAX_HISTORY = maxHistory;
-	manualRange = false;
-	onlyLowestIsFixed = false;
+	rangeMode = RANGE_AUTOMATIC;
 	count = 1;
 	precision = 2;
 	lineWidth = 1.0f;
@@ -73,25 +72,25 @@ void ofxHistoryPlot::update(float newVal){
 	if (newVal != newVal && valf != NULL)	//if no value is supplied (default value NAN), use the float* we were given..
 		newVal = *valf;	
 	
-	int skip = 3;
-	if((!manualRange || onlyLowestIsFixed) && shrinkBackInAutoRange){
+	int skip = 1;
+	//if((!manualRange || onlyLowestIsFixed) && shrinkBackInAutoRange){
 		//if (!autoUpdate) skip = 1;	//if not doing this too fast, no need to skip range processing
-		if ( count%skip == 0 ){			
-			if (!onlyLowestIsFixed) lowest = FLT_MAX;
+		if ( count%skip == 0 ){
+			lowest = FLT_MAX;
 			highest = -FLT_MIN;
-			for (int i = 0; i < values.size(); i+=skip){
-				float val = values[i];
+			for (int i = 0; i < values.size(); i += skip){
+				const float val = values[i];
 				if (val > highest) highest = val;
-				if (!onlyLowestIsFixed) if (val < lowest) lowest = val;
+				if (val < lowest) lowest = val;
 			}	
 			if (lowest == FLT_MAX) lowest = -1;
 			if (highest == -FLT_MIN) highest = 1;
 		}
-	}
-	if(!manualRange){
-		if ( newVal > highest) highest = newVal;
-		if ( newVal < lowest && !onlyLowestIsFixed) lowest = newVal;
-	}
+	//}
+	//if(!manualRange){
+	if ( newVal > highest) highest = newVal;
+	if ( newVal < lowest) lowest = newVal;
+	//}
 
 	values.push_back(newVal);
 
@@ -176,6 +175,15 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 		plotNeedsRefresh = false;
 	}
 
+	float plotLow;
+	float plotHigh;
+
+	switch (rangeMode) {
+		case RANGE_MANUAL: plotLow = manualLowest; plotHigh = manualHighest; break;
+		case RANGE_LOWER_FIXED: plotLow = manualLowest; plotHigh = highest; break;
+		case RANGE_AUTOMATIC: plotLow = lowest; plotHigh = highest; break;
+	}
+
 	bool needsGrid = r != prevRect;
 
 	ofPushStyle();
@@ -206,14 +214,14 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 	}
 	if ( showNumericalInfo ){
 		ofSetColor(85);
-		ofDrawBitmapString(ofToString(highest, precision), 1 + x , y + 10);
-		ofDrawBitmapString(ofToString(lowest, precision), 1 + x , y + h - 1);
+		ofDrawBitmapString(ofToString(plotHigh, precision), 1 + x , y + 10);
+		ofDrawBitmapString(ofToString(plotLow, precision), 1 + x , y + h - 1);
 	}
 
 	for(int i = 0; i < horizontalGuides.size(); i++){
 		float myY = horizontalGuides[i];
-		if (myY > lowest && myY < highest){ //TODO negative!
-			float yy = ofMap( myY, lowest, highest, 0, h, true);
+		if (myY > plotLow && myY < plotHigh){ //TODO negative!
+			float yy = ofMap( myY, plotLow, plotHigh, 0, h, true);
 			ofSetColor(horizontalGuideColors[i], 50);
 			ofDrawBitmapString(ofToString(horizontalGuides[i], precision), 10 + x, y + h - yy + 10 );
 			ofSetColor(horizontalGuideColors[i], 64 );
@@ -221,10 +229,8 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 		}
 	}
 
-
 	if (haveData){
 		ofNoFill();
-
 		ofSetLineWidth(lineWidth);
 
 			if(needsMesh){
@@ -243,18 +249,18 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 			ofPushMatrix();
 			if(scissor){
 				glEnable(GL_SCISSOR_TEST);
-				glScissor(x, ofGetHeight() -y -h, w, h);
+				glScissor(x, ofGetViewportHeight() -y -h, w, h);
 			}
 			if (respectBorders) h -= 12;
 			ofTranslate(x,y + h + (respectBorders ? 12 : 0) - 1);
-			float plotValuesRange = highest - lowest;
+			float plotValuesRange = plotHigh - plotLow;
 			float yscale = (h-1) / plotValuesRange;
 			if(drawFromRight){
 				ofTranslate(w , 0);
 				ofScale(-1,1);
 			}
 			ofScale(w / MAX_HISTORY, -yscale );
-			ofTranslate(0, -lowest);
+			ofTranslate(0, -plotLow);
 			plotMesh.draw();
 			if (showSmoothedPlot){
 				ofSetColor(lineColor.r, lineColor.g, lineColor.b, lineColor.a);
@@ -272,10 +278,9 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 
 
 void ofxHistoryPlot::setRange(float low, float high){
-	manualRange = true;
-	onlyLowestIsFixed = false;
-	lowest = low;
-	highest = high;
+	rangeMode = RANGE_MANUAL;
+	manualLowest = low;
+	manualHighest = high;
 }
 
 void ofxHistoryPlot::setDrawFromRight(bool _val) {
@@ -293,8 +298,7 @@ float ofxHistoryPlot::getHigerRange(){
 
 
 void ofxHistoryPlot::setLowerRange(float low){
-	manualRange = true;
-	onlyLowestIsFixed = true;
+	rangeMode = RANGE_LOWER_FIXED;
 	lowest = low;
 }
 

@@ -67,6 +67,12 @@ class ofxHistoryPlot{
 
 	private:
 
+		enum RangeMode{
+			RANGE_MANUAL,
+			RANGE_LOWER_FIXED,
+			RANGE_AUTOMATIC
+		};
+
 		void refillGridMesh(float x, float y , float w, float h);
 		void refillPlotMesh(ofVboMesh& mesh, deque<float> & vals, float x, float y , float w, float h);
 
@@ -80,9 +86,10 @@ class ofxHistoryPlot{
 		vector<ofColor>	horizontalGuideColors;
 
 		float			lowest, highest;
-		bool			manualRange;
-		bool			onlyLowestIsFixed;
-	
+		float			manualLowest, manualHighest;
+
+		RangeMode		rangeMode;
+
 		bool			drawBackground;
 
 		bool			autoUpdate;
