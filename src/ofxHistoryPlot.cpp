@@ -194,16 +194,16 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 	if (drawBackground){
 		ofSetColor(bgColor);
 		ofRect(x, y, w, h);
-		if (drawGrid){
-			if(needsGrid){
-				refillGridMesh(x, y, w, h);
-			}
-			ofSetColor(gridColor);
-			ofSetLineWidth(1);
-			ofDisableAntiAliasing();
-			gridMesh.draw();
-			ofEnableAntiAliasing();
+	}
+	if (drawGrid){
+		if(needsGrid || gridMesh.getVertices().size() == 0){
+			refillGridMesh(x, y, w, h);
 		}
+		ofSetColor(gridColor);
+		ofSetLineWidth(1);
+		ofDisableAntiAliasing();
+		gridMesh.draw();
+		ofEnableAntiAliasing();
 	}
 	ofSetColor(lineColor);
 	float cVal;
