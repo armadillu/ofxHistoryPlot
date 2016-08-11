@@ -193,7 +193,7 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 
 	if (drawBackground){
 		ofSetColor(bgColor);
-		ofRect(x, y, w, h);
+		ofDrawRectangle(x, y, w, h);
 	}
 	if (drawGrid){
 		if(needsGrid || gridMesh.getVertices().size() == 0){
@@ -225,7 +225,7 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 			ofSetColor(horizontalGuideColors[i], 50);
 			ofDrawBitmapString(ofToString(horizontalGuides[i], precision), 10 + x, y + h - yy + 10 );
 			ofSetColor(horizontalGuideColors[i], 64 );
-			ofLine( x, y + h - yy, x + w, y + h - yy );
+			ofDrawLine( x, y + h - yy, x + w, y + h - yy );
 		}
 	}
 
