@@ -313,7 +313,7 @@ float ofxHistoryPlot::getHigerRange(){
 
 void ofxHistoryPlot::setLowerRange(float low){
 	rangeMode = RANGE_LOWER_FIXED;
-	lowest = low;
+	manualLowest = low;
 }
 
 float ofxHistoryPlot::getLowestValue(){
