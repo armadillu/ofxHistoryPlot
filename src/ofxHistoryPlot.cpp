@@ -45,6 +45,7 @@ ofxHistoryPlot::ofxHistoryPlot(float * val, string varName, float maxHistory, bo
 	smoothFactor = 0.1;
 	smoothValue = 0;
 	showSmoothedPlot = false;
+	drawGuideValues = false;
 	scissor = false;
 	lineColor = ofColor(255,0,0);
 	drawFromRight = false;
@@ -222,8 +223,10 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 		float myY = horizontalGuides[i];
 		if (myY > plotLow && myY < plotHigh){ //TODO negative!
 			float yy = ofMap( myY, plotLow, plotHigh, 0, h, true);
-			ofSetColor(horizontalGuideColors[i], 50);
-			ofDrawBitmapString(ofToString(horizontalGuides[i], precision), 10 + x, y + h - yy + 10 );
+			if(drawGuideValues){
+				ofSetColor(horizontalGuideColors[i], 50);
+				ofDrawBitmapString(ofToString(horizontalGuides[i], precision), 10 + x, y + h - yy + 10 );
+			}
 			ofSetColor(horizontalGuideColors[i], 64 );
 			ofDrawLine( x, y + h - yy, x + w, y + h - yy );
 		}
@@ -243,7 +246,7 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 			if(showSmoothedPlot){
 				ofSetColor(lineColor.r * 0.25, lineColor.g * 0.25, lineColor.b * 0.25, lineColor.a);
 			}else{
-				ofSetColor(lineColor.r, lineColor.g, lineColor.b, lineColor.a);
+				ofSetColor(lineColor);
 			}
 
 			ofPushMatrix();
@@ -263,7 +266,7 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 			ofTranslate(0, -plotLow);
 			plotMesh.draw();
 			if (showSmoothedPlot){
-				ofSetColor(lineColor.r, lineColor.g, lineColor.b, lineColor.a);
+				ofSetColor(lineColor);
 				smoothPlotMesh.draw();
 			}
 			if(scissor){

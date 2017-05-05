@@ -34,6 +34,7 @@ class ofxHistoryPlot{
 
 		void addHorizontalGuide(float yval, ofColor c);
 		void clearHorizontalGuides();
+		void setDrawGuideValues(bool doIt){drawGuideValues = doIt;}
 
 		void setMaxHistory(int max);
 		void setPrecision(int prec){ precision = ofClamp(prec, 0, 15); }	//number of decimals to show
@@ -87,6 +88,7 @@ class ofxHistoryPlot{
 		deque<float>	smoothValues;
 
 		vector<float>	horizontalGuides;
+		bool			drawGuideValues;
 		vector<ofColor>	horizontalGuideColors;
 
 		float			lowest, highest;
