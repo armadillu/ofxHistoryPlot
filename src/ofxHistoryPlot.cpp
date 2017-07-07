@@ -79,7 +79,7 @@ void ofxHistoryPlot::update(float newVal){
 		if ( count%skip == 0 ){
 			lowest = FLT_MAX;
 			highest = -FLT_MIN;
-			for (int i = 0; i < values.size(); i += skip){
+			for (size_t i = 0; i < values.size(); i += skip){
 				const float val = values[i];
 				if (val > highest) highest = val;
 				if (val < lowest) lowest = val;
@@ -127,12 +127,12 @@ void ofxHistoryPlot::refillGridMesh(float x, float y , float w, float h){
 	int gridH = gridUnit;
 	float numLinesH = h / gridH;
 	gridMesh.setMode(OF_PRIMITIVE_LINES);
-	for(int i = 0; i < numLinesH; i++){
+	for(size_t i = 0; i < numLinesH; i++){
 		gridMesh.addVertex( ofVec3f(x,  y + gridH * i) );
 		gridMesh.addVertex( ofVec3f(x + w,  y + gridH * i) );
 	}
 	float numLinesW = w / gridH;
-	for(int i = 0; i < numLinesW; i++){
+	for(size_t i = 0; i < numLinesW; i++){
 		gridMesh.addVertex( ofVec3f( floor(gridH * 0.5) + x + gridH * i, y ) );
 		gridMesh.addVertex( ofVec3f( floor(gridH * 0.5) + x + gridH * i, y + h) );
 	}
@@ -147,7 +147,7 @@ void ofxHistoryPlot::refillPlotMesh(ofVboMesh& mesh, deque<float> & vals, float 
 		start = drawSkip - (count) % (drawSkip);
 	}
 
-	for (int i =  start; i < vals.size(); i+= drawSkip){
+	for (size_t i =  start; i < vals.size(); i+= drawSkip){
 		mesh.addVertex(ofVec3f(i, vals[i]));
 	}
 }
@@ -219,7 +219,7 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 		ofDrawBitmapString(ofToString(plotLow, precision), 1 + x , y + h - 1);
 	}
 
-	for(int i = 0; i < horizontalGuides.size(); i++){
+	for(size_t i = 0; i < horizontalGuides.size(); i++){
 		float myY = horizontalGuides[i];
 		if (myY > plotLow && myY < plotHigh){ //TODO negative!
 			float yy = ofMap( myY, plotLow, plotHigh, 0, h, true);
