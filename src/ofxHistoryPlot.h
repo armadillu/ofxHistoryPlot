@@ -20,7 +20,7 @@ class ofxHistoryPlot{
 
 	public :
 
-		ofxHistoryPlot(float * val, string varName, float maxHistory, bool autoUpdate_ = true);
+		ofxHistoryPlot(float * val, std::string varName, float maxHistory, bool autoUpdate_ = true);
 		
 		void update( float val = numeric_limits<float>::quiet_NaN() );	//adds in the plot current value of the specified var, 
 											//usually you would call this once per frame if not autoUpdate_ == false for the graph to update
@@ -66,9 +66,9 @@ class ofxHistoryPlot{
 		void setSmoothFilter(float filter){smoothFactor = filter;};
 		void setCropToRect(bool s){scissor = s;}
 
-		deque<float>& getValues(){ return values; }
+		std::deque<float>& getValues(){ return values; }
     
-        string getVariableName();
+        std::string getVariableName();
 
 	private:
 
@@ -81,15 +81,15 @@ class ofxHistoryPlot{
 		void refillGridMesh(float x, float y , float w, float h);
 		void refillPlotMesh(ofVboMesh& mesh, deque<float> & vals, float x, float y , float w, float h);
 
-		string			varName;
+		std::string			varName;
 		float *			valf;
 	
-		deque<float>	values;
-		deque<float>	smoothValues;
+		std::deque<float>	values;
+		std::deque<float>	smoothValues;
 
-		vector<float>	horizontalGuides;
+		std::vector<float>	horizontalGuides;
 		bool			drawGuideValues;
-		vector<ofColor>	horizontalGuideColors;
+		std::vector<ofColor>	horizontalGuideColors;
 
 		float			lowest, highest;
 		float			manualLowest, manualHighest;

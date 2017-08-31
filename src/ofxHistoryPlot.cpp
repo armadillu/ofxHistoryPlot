@@ -10,6 +10,8 @@
 #include "ofxHistoryPlot.h"
 #include <float.h>
 
+using namespace std;
+
 ofxHistoryPlot::ofxHistoryPlot(float * val, string varName, float maxHistory, bool autoUpdate_){
 	
 	autoUpdate = autoUpdate_;
