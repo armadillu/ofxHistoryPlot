@@ -127,14 +127,14 @@ void ofxHistoryPlot::refillGridMesh(float x, float y , float w, float h){
 
 	gridMesh.clear();
 	int gridH = gridUnit;
-	float numLinesH = h / gridH;
+	float numLinesH = floor(h / gridH);
 	gridMesh.setMode(OF_PRIMITIVE_LINES);
-	for(size_t i = 0; i < numLinesH; i++){
+	for(int i = 0; i < numLinesH; i++){
 		gridMesh.addVertex( ofVec3f(x,  y + gridH * i) );
 		gridMesh.addVertex( ofVec3f(x + w,  y + gridH * i) );
 	}
-	float numLinesW = w / gridH;
-	for(size_t i = 0; i < numLinesW; i++){
+	float numLinesW = floor(w / gridH);
+	for(int i = 0; i < numLinesW; i++){
 		gridMesh.addVertex( ofVec3f( floor(gridH * 0.5) + x + gridH * i, y ) );
 		gridMesh.addVertex( ofVec3f( floor(gridH * 0.5) + x + gridH * i, y + h) );
 	}
