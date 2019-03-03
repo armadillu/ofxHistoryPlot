@@ -60,7 +60,8 @@ class ofxHistoryPlot{
 		float getLowerRange();
 		float getHigerRange();
 		float getLowestValue();
-		float getHigestValue();
+		float getHigestValue(); //deprecated - typo!
+		float getHighestValue(){getHigestValue();};
 
 		void setShowSmoothedCurve(bool show){showSmoothedPlot = show;}
 		void setSmoothFilter(float filter){smoothFactor = filter;};
