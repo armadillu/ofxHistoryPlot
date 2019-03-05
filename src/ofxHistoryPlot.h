@@ -70,6 +70,7 @@ class ofxHistoryPlot{
 		std::deque<float>& getValues(){ return values; }
     
         std::string getVariableName();
+		void setVariableName(const std::string & var){varName = var;};
 
 	private:
 
