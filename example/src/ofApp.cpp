@@ -26,12 +26,6 @@ void ofApp::setup() {
 	plot->setGridUnit(14);
 	plot->setCropToRect(true);
 
-	////to test get smmooth value
-	//plot->setShowSmoothedCurve(true); //plot a smoothed version of the values, but alos the original in lesser alpha
-	//plot->setSmoothFilter(0.1); //smooth filter strength
-	//plot->setRangeAuto();
-	//plot->setAutoRangeShrinksBack(true); //plot scale can shrink back after growing if plot curves requires it
-
 
 	plot2 = new ofxHistoryPlot(&currentFrameRate, "currentFrameRate auto updated", numSamples, true);	//true for autoupdate
 	//plot2->setLowerRange(0); //set only the lowest part of the range upper is adaptative to curve
@@ -70,7 +64,7 @@ void ofApp::draw() {
 	plot2->draw(10, 10 + 10 + 240, 640, 240);
 
 	ofDrawBitmapString("Press mouse button and drag.", 10, 520);
-	ofDrawBitmapString("+/- to change smooth. Smooth power:" + ofToString(smoothPower), 10, 540);
+	ofDrawBitmapString("Press +/- to change Smooth power. (0: max. 1:disabled) Smooth power:" + ofToString(smoothPower), 10, 540);
 
 
 	//get smoothed value
@@ -78,8 +72,7 @@ void ofApp::draw() {
 	ofFill();
 	ofSetColor(255);
 	float _val = ofMap(_smoothValue, plot2->getLowerRange(), plot2->getHigerRange(), 0, 1);
-	ofDrawRectangle(10 + 640, 10 + 10 + 240 +240, 40, -(plot2->getHeight() * _val));
-	//ofDrawRectangle(10 + 640, 10 + 240, 40, -(plot->getHeight() * _val));
+	ofDrawRectangle(0, 10 + 10 + 240 + 240, 10, -(plot2->getHeight() * _val));
 }
 
 //--------------------------------------------------------------
@@ -95,17 +88,15 @@ void ofApp::keyPressed(int key) {
 	if (key == '-')
 	{
 		smoothPower = smoothPower - 0.1;
-		if (smoothPower < 0)smoothPower = 0;
-		plot2->setSmoothFilter(smoothPower); //smooth filter strength
+		if (smoothPower < 0.1) smoothPower = 0;
+		plot2->setSmoothFilter(smoothPower); 
 	}
 	if (key == '+')
 	{
 		smoothPower = smoothPower + 0.1;
-		if (smoothPower > 1)smoothPower = 1;
-		plot2->setSmoothFilter(smoothPower); //smooth filter strength
+		if (smoothPower > 1) smoothPower = 1;
+		plot2->setSmoothFilter(smoothPower);
 	}
-
-
 }
 
 //--------------------------------------------------------------
