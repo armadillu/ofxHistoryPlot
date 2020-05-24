@@ -25,4 +25,6 @@ class ofApp : public ofBaseApp{
 	
 		bool mouseIsPressed;
 		float currentFrameRate;
+
+		float smoothPower = 0.5;
 };

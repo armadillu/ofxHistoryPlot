@@ -72,6 +72,9 @@ class ofxHistoryPlot{
         std::string getVariableName();
 		void setVariableName(const std::string & var){varName = var;};
 
+		float getSmoothValue(){
+			return smoothValue;
+		}
 	private:
 
 		enum RangeMode{
