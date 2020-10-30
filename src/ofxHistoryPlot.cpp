@@ -26,7 +26,7 @@ ofxHistoryPlot::ofxHistoryPlot(float * val, string varName, float maxHistory, bo
 	}
 	MAX_HISTORY = maxHistory;
 	rangeMode = RANGE_AUTOMATIC;
-	count = 1;
+	count = 0;
 	precision = 2;
 	lineWidth = 1.0f;
 	drawSkip = 1;
@@ -61,39 +61,42 @@ void ofxHistoryPlot::reset(){
 	values.clear();
 	smoothValues.clear();
 	count = 0;
+	lowest= -1; highest = 1;
 }
 
+void ofxHistoryPlot::recalcLowHigh(){
+	float lowest = FLT_MAX;
+	float highest = -FLT_MIN;
+	for (size_t i = 0; i < values.size(); i ++){
+		const float val = values[i];
+		if (val > highest) highest = val;
+		if (val < lowest) lowest = val;
+	}
+	if (lowest == FLT_MAX) lowest = -1;
+	if (highest == -FLT_MIN) highest = 1;
+
+	if(shrinkBackInAutoRange){
+		this->lowest = lowest;
+		this->highest = highest;
+	}else{ //never shrink range
+		if(this->lowest < lowest ) this->lowest = lowest;
+		if(this->highest > highest) this->highest = highest;
+	}
+}
 
 void ofxHistoryPlot::update(float newVal){
 
-	if (count <= 1 && newVal == newVal/*nan filter*/){
+	if (count < 1 && newVal == newVal/*nan filter*/){
 		smoothValue = newVal;
 	}
 
 	count++;
 	
-	if (newVal != newVal && valf != NULL)	//if no value is supplied (default value NAN), use the float* we were given..
+	if (newVal != newVal && valf != NULL)	//if no value is supplied (default newVal value NAN), use the float* we were given..
 		newVal = *valf;	
 	
-	int skip = 1;
-	//if((!manualRange || onlyLowestIsFixed) && shrinkBackInAutoRange){
-		//if (!autoUpdate) skip = 1;	//if not doing this too fast, no need to skip range processing
-		if ( count%skip == 0 ){
-			lowest = FLT_MAX;
-			highest = -FLT_MIN;
-			for (size_t i = 0; i < values.size(); i += skip){
-				const float val = values[i];
-				if (val > highest) highest = val;
-				if (val < lowest) lowest = val;
-			}	
-			if (lowest == FLT_MAX) lowest = -1;
-			if (highest == -FLT_MIN) highest = 1;
-		}
-	//}
-	//if(!manualRange){
-	if ( newVal > highest) highest = newVal;
-	if ( newVal < lowest) lowest = newVal;
-	//}
+	if (newVal > highest) highest = newVal;
+	if (newVal < lowest) lowest = newVal;
 
 	values.push_back(newVal);
 
@@ -102,8 +105,18 @@ void ofxHistoryPlot::update(float newVal){
 		smoothValues.push_back(smoothValue);
 	}
 
+	bool needsRangeRecalc = false;
+
 	while (values.size() > MAX_HISTORY){
+		float valToDelete = *values.begin();
+		if(valToDelete <= lowest || valToDelete >= highest){ //we are deleting values from plot, were theey max or min?
+			needsRangeRecalc = true;
+		}
 		values.erase( values.begin() );
+	}
+
+	if(needsRangeRecalc || count%60 == 0){
+		recalcLowHigh();
 	}
 
 	if(showSmoothedPlot) {
@@ -145,10 +158,6 @@ void ofxHistoryPlot::refillPlotMesh(ofVboMesh& mesh, deque<float> & vals, float 
 
 	mesh.clear();
 	int start = 0;
-	if (count >= MAX_HISTORY){
-		start = drawSkip - (count) % (drawSkip);
-	}
-
 	for (size_t i =  start; i < vals.size(); i+= drawSkip){
 		mesh.addVertex(ofVec3f(i, vals[i]));
 	}
@@ -325,12 +334,42 @@ float ofxHistoryPlot::getLowestValue(){
 	return lowest;
 }
 
-float ofxHistoryPlot::getHigestValue(){
+float ofxHistoryPlot::getHighestValue(){
 	return highest;
 }
 
 
+void ofxHistoryPlot::setVariableName(const std::string & var){varName = var;};
+string ofxHistoryPlot::getVariableName(){return varName;};
 
-string ofxHistoryPlot::getVariableName(){
-    return varName;
+
+void ofxHistoryPlot::setAutoRangeShrinksBack(bool shrink){
+	shrinkBackInAutoRange = shrink;
 };
+
+void ofxHistoryPlot::setDrawGuideValues(bool doIt){drawGuideValues = doIt;}
+
+void ofxHistoryPlot::setPrecision(int prec){ precision = ofClamp(prec, 0, 15); }
+
+void ofxHistoryPlot::setColor(const ofColor & c){ lineColor = c;}
+ofColor ofxHistoryPlot::getColor(){return lineColor;}
+void ofxHistoryPlot::setBackgroundColor(const ofColor & c){ bgColor = c;}
+
+void ofxHistoryPlot::setDrawGrid(bool d) { drawGrid = d;}
+void ofxHistoryPlot::setGridColor(ofColor c){ gridColor = c;}
+void ofxHistoryPlot::setGridUnit(float g){gridUnit = g;}
+
+
+void ofxHistoryPlot::setShowNumericalInfo(bool show){ showNumericalInfo = show;}
+void ofxHistoryPlot::setRespectBorders(bool respect){respectBorders = respect;}
+void ofxHistoryPlot::setDrawSkipVal(int skip){ drawSkip = skip; if (drawSkip < 1) drawSkip = 1;}
+void ofxHistoryPlot::setLineWidth(float w){ lineWidth = w;}
+void ofxHistoryPlot::setDrawBackground(bool d) { drawBackground = d;}
+void ofxHistoryPlot::setDrawTitle(bool doit){drawTitle = doit;}
+
+void ofxHistoryPlot::setShowSmoothedCurve(bool show){showSmoothedPlot = show;}
+void ofxHistoryPlot::setSmoothFilter(float filter){smoothFactor = filter;};
+
+void ofxHistoryPlot::setCropToRect(bool s){scissor = s;}
+
+std::deque<float>& ofxHistoryPlot::getValues(){ return values; }
