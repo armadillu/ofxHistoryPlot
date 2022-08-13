@@ -75,6 +75,9 @@ class ofxHistoryPlot{
 		float getSmoothValue(){
 			return smoothValue;
 		}
+
+		ofColor getBackgroundColor() { return bgColor; }
+
 	private:
 
 		enum RangeMode{
