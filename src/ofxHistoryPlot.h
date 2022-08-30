@@ -79,6 +79,10 @@ class ofxHistoryPlot{
 		ofColor getBackgroundColor() { return bgColor; }
 
 	private:
+		
+		// custom font
+		ofTrueTypeFont font;
+		int fontSize = 6;
 
 		enum RangeMode{
 			RANGE_MANUAL,

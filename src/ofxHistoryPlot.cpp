@@ -51,6 +51,12 @@ ofxHistoryPlot::ofxHistoryPlot(float * val, string varName, float maxHistory, bo
 	scissor = false;
 	lineColor = ofColor(255,0,0);
 	drawFromRight = false;
+
+	std::string _path = "assets/fonts/"; // assets folder
+	string f = "JetBrainsMono-Bold.ttf";
+	_path += f;
+	bool b = font.load(_path, fontSize);
+	if (!b) font.load(OF_TTF_MONO, fontSize);
 }
 
 void ofxHistoryPlot::setMaxHistory(int max){
@@ -213,12 +219,16 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 	if(haveData) cVal = *values.rbegin();
 	if(drawTitle){
 		string text = varName + string(haveData ? (" " + ofToString(cVal, precision)) : "");
-		ofDrawBitmapString(text, x + w - (text.length()) * 8  , y + 10);
+		//ofDrawBitmapString(text, x + w - (text.length()) * 8  , y + 10);
+		float _w = font.getStringBoundingBox(text, 0, 0).getWidth();
+		font.drawString(text, x + w - _w, y + 10);
 	}
 	if ( showNumericalInfo ){
 		ofSetColor(85);
-		ofDrawBitmapString(ofToString(plotHigh, precision), 1 + x , y + 10);
-		ofDrawBitmapString(ofToString(plotLow, precision), 1 + x , y + h - 1);
+		//ofDrawBitmapString(ofToString(plotHigh, precision), 1 + x , y + 10);
+		//ofDrawBitmapString(ofToString(plotLow, precision), 1 + x , y + h - 1);
+		font.drawString(ofToString(plotHigh, precision), 1 + x, y + 10);
+		font.drawString(ofToString(plotLow, precision), 1 + x, y + h - 1);
 	}
 
 	for(size_t i = 0; i < horizontalGuides.size(); i++){
@@ -227,7 +237,8 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 			float yy = ofMap( myY, plotLow, plotHigh, 0, h, true);
 			if(drawGuideValues){
 				ofSetColor(horizontalGuideColors[i], 50);
-				ofDrawBitmapString(ofToString(horizontalGuides[i], precision), 10 + x, y + h - yy + 10 );
+				//ofDrawBitmapString(ofToString(horizontalGuides[i], precision), 10 + x, y + h - yy + 10 );
+				font.drawString(ofToString(horizontalGuides[i], precision), 10 + x, y + h - yy + 10 );
 			}
 			ofSetColor(horizontalGuideColors[i], 64 );
 			ofDrawLine( x, y + h - yy, x + w, y + h - yy );
