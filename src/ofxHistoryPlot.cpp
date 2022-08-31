@@ -49,7 +49,7 @@ ofxHistoryPlot::ofxHistoryPlot(float * val, string varName, float maxHistory, bo
 	showSmoothedPlot = false;
 	drawGuideValues = false;
 	scissor = false;
-	lineColor = ofColor(255,0,0);
+	lineColor = ofColor(255,0,0, 255);
 	drawFromRight = false;
 
 	std::string _path = "assets/fonts/"; // assets folder
@@ -220,7 +220,7 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 	if(drawTitle){
 		string text = varName + string(haveData ? (" " + ofToString(cVal, precision)) : "");
 		//ofDrawBitmapString(text, x + w - (text.length()) * 8  , y + 10);
-		float _w = font.getStringBoundingBox(text, 0, 0).getWidth();
+		float _w = font.getStringBoundingBox(text, 0, 0).getWidth() + 5;
 		font.drawString(text, x + w - _w, y + 10);
 	}
 	if ( showNumericalInfo ){
@@ -259,7 +259,8 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 			if(showSmoothedPlot){
 				ofSetColor(lineColor.r * 0.25, lineColor.g * 0.25, lineColor.b * 0.25, lineColor.a);
 			}else{
-				ofSetColor(lineColor);
+				//ofSetColor(lineColor);
+				ofSetColor(lineColor, lineColor.a);
 			}
 
 			ofPushMatrix();
@@ -279,7 +280,8 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 			ofTranslate(0, -plotLow);
 			plotMesh.draw();
 			if (showSmoothedPlot){
-				ofSetColor(lineColor);
+				//ofSetColor(lineColor);
+				ofSetColor(lineColor, lineColor.a);
 				smoothPlotMesh.draw();
 			}
 			if(scissor){
