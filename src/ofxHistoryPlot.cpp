@@ -8,7 +8,6 @@
  */
 
 #include "ofxHistoryPlot.h"
-#include <float.h>
 
 using namespace std;
 
@@ -56,7 +55,8 @@ ofxHistoryPlot::ofxHistoryPlot(float * val, string varName, float maxHistory, bo
 	string f = "JetBrainsMono-Bold.ttf";
 	_path += f;
 	bool b = font.load(_path, fontSize);
-	if (!b) font.load(OF_TTF_MONO, fontSize);
+	if (!b) b=font.load(OF_TTF_MONO, fontSize);
+	if (!b) ofLogError() << "Font file not found!";
 }
 
 void ofxHistoryPlot::setMaxHistory(int max){
@@ -217,28 +217,37 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 	ofSetColor(lineColor);
 	float cVal;
 	if(haveData) cVal = *values.rbegin();
-	if(drawTitle){
+	if (drawTitle) {
 		string text = varName + string(haveData ? (" " + ofToString(cVal, precision)) : "");
-		//ofDrawBitmapString(text, x + w - (text.length()) * 8  , y + 10);
-		float _w = font.getStringBoundingBox(text, 0, 0).getWidth() + 5;
-		font.drawString(text, x + w - _w, y + 10);
+		if (!font.isLoaded()) {
+			ofDrawBitmapString(text, x + w - (text.length()) * 8, y + 10);
+		} else {
+			float _w = font.getStringBoundingBox(text, 0, 0).getWidth() + 5;
+			font.drawString(text, x + w - _w, y + 10);
+		}
 	}
-	if ( showNumericalInfo ){
+	if (showNumericalInfo) {
 		ofSetColor(85);
-		//ofDrawBitmapString(ofToString(plotHigh, precision), 1 + x , y + 10);
-		//ofDrawBitmapString(ofToString(plotLow, precision), 1 + x , y + h - 1);
-		font.drawString(ofToString(plotHigh, precision), 1 + x, y + 10);
-		font.drawString(ofToString(plotLow, precision), 1 + x, y + h - 1);
+		if (!font.isLoaded()) {
+			ofDrawBitmapString(ofToString(plotHigh, precision), 1 + x, y + 10);
+			ofDrawBitmapString(ofToString(plotLow, precision), 1 + x, y + h - 1);
+		}else{
+			font.drawString(ofToString(plotHigh, precision), 1 + x, y + 10);
+			font.drawString(ofToString(plotLow, precision), 1 + x, y + h - 1);
+		}
 	}
 
 	for(size_t i = 0; i < horizontalGuides.size(); i++){
 		float myY = horizontalGuides[i];
 		if (myY > plotLow && myY < plotHigh){ //TODO negative!
 			float yy = ofMap( myY, plotLow, plotHigh, 0, h, true);
-			if(drawGuideValues){
+			if (drawGuideValues) {
 				ofSetColor(horizontalGuideColors[i], 50);
-				//ofDrawBitmapString(ofToString(horizontalGuides[i], precision), 10 + x, y + h - yy + 10 );
-				font.drawString(ofToString(horizontalGuides[i], precision), 10 + x, y + h - yy + 10 );
+				if (!font.isLoaded()) {
+					ofDrawBitmapString(ofToString(horizontalGuides[i], precision), 10 + x, y + h - yy + 10);
+				} else {
+					font.drawString(ofToString(horizontalGuides[i], precision), 10 + x, y + h - yy + 10);
+				}
 			}
 			ofSetColor(horizontalGuideColors[i], 64 );
 			ofDrawLine( x, y + h - yy, x + w, y + h - yy );

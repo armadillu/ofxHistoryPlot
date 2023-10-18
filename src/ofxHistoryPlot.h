@@ -22,7 +22,7 @@ class ofxHistoryPlot{
 
 		ofxHistoryPlot(float * val, std::string varName, float maxHistory, bool autoUpdate_ = true);
 		
-		void update( float val = numeric_limits<float>::quiet_NaN() );	//adds in the plot current value of the specified var, 
+		void update( float val = std::numeric_limits<float>::quiet_NaN() );	//adds in the plot current value of the specified var, 
 											//usually you would call this once per frame if not autoUpdate_ == false for the graph to update
 										
 		void draw(float x, float y , float w = DEFAULT_WIDTH, float h = DEFAULT_HEIGHT);	//draws a box
