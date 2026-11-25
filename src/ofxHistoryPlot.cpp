@@ -9,6 +9,8 @@
 
 #include "ofxHistoryPlot.h"
 #include <float.h>
+#include <algorithm>
+#include <cmath>
 
 using namespace std;
 
@@ -18,8 +20,8 @@ ofxHistoryPlot::ofxHistoryPlot(float * val, string varName, float maxHistory, bo
 	this->varName = varName;
 	valf = val;
 	if (val != NULL){
-		lowest = *valf * 0.99;
-		highest = *valf * 1.01;
+		lowest = std::min(*valf * 0.99f, *valf * 1.01f);
+		highest = std::max(*valf * 0.99f, *valf * 1.01f);
 	}else{
 		lowest = -1;
 		highest = 1;
@@ -39,6 +41,8 @@ ofxHistoryPlot::ofxHistoryPlot(float * val, string varName, float maxHistory, bo
 	drawGrid = true;
 	shrinkBackInAutoRange = false;
 	plotNeedsRefresh = true;
+	gridNeedsRefresh = true;
+	valuesExposed = false;
 	gridMesh.setMode(OF_PRIMITIVE_LINES);
 	plotMesh.setMode(OF_PRIMITIVE_LINE_STRIP);
 	plotMesh.getVertices().reserve(MAX_HISTORY * 2);
@@ -62,25 +66,28 @@ void ofxHistoryPlot::reset(){
 	smoothValues.clear();
 	count = 0;
 	lowest= -1; highest = 1;
+	plotNeedsRefresh = true;
 }
 
 void ofxHistoryPlot::recalcLowHigh(){
 	float lowest = FLT_MAX;
-	float highest = -FLT_MIN;
+	float highest = -FLT_MAX;
 	for (size_t i = 0; i < values.size(); i ++){
 		const float val = values[i];
 		if (val > highest) highest = val;
 		if (val < lowest) lowest = val;
 	}
-	if (lowest == FLT_MAX) lowest = -1;
-	if (highest == -FLT_MIN) highest = 1;
+	if (values.empty()){
+		lowest = -1;
+		highest = 1;
+	}
 
 	if(shrinkBackInAutoRange){
 		this->lowest = lowest;
 		this->highest = highest;
 	}else{ //never shrink range
-		if(this->lowest < lowest ) this->lowest = lowest;
-		if(this->highest > highest) this->highest = highest;
+		if(this->lowest > lowest ) this->lowest = lowest;
+		if(this->highest < highest) this->highest = highest;
 	}
 }
 
@@ -180,6 +187,12 @@ void ofxHistoryPlot::clearHorizontalGuides(){
 
 void ofxHistoryPlot::draw(float x, float y , float w, float h){
 
+	if (autoUpdate) update();
+	// A caller can retain the mutable reference and change it at any time.
+	if (valuesExposed){
+		recalcLowHigh();
+		plotNeedsRefresh = true;
+	}
 	bool needsMesh = false;
 	ofRectangle r = ofRectangle(x,y,w,h);
 	if ( r != prevRect || autoUpdate || plotNeedsRefresh){
@@ -195,11 +208,15 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 		case RANGE_LOWER_FIXED: plotLow = manualLowest; plotHigh = highest; break;
 		case RANGE_AUTOMATIC: plotLow = lowest; plotHigh = highest; break;
 	}
+	if (rangeMode == RANGE_AUTOMATIC && plotLow == plotHigh){
+		float padding = std::max(1.0f, std::abs(plotLow) * 0.01f);
+		plotLow -= padding;
+		plotHigh += padding;
+	}
 
 	bool needsGrid = r != prevRect;
 
 	ofPushStyle();
-	if (autoUpdate) update();
 	bool haveData = true;
 	if (values.size() == 0 ) haveData = false;
 
@@ -208,8 +225,9 @@ void ofxHistoryPlot::draw(float x, float y , float w, float h){
 		ofDrawRectangle(x, y, w, h);
 	}
 	if (drawGrid){
-		if(needsGrid || gridMesh.getVertices().size() == 0){
+		if(needsGrid || gridNeedsRefresh || gridMesh.getVertices().size() == 0){
 			refillGridMesh(x, y, w, h);
+			gridNeedsRefresh = false;
 		}
 		ofSetColor(gridColor);
 		ofSetLineWidth(1);
@@ -345,6 +363,7 @@ string ofxHistoryPlot::getVariableName(){return varName;};
 
 void ofxHistoryPlot::setAutoRangeShrinksBack(bool shrink){
 	shrinkBackInAutoRange = shrink;
+	if (shrink) recalcLowHigh();
 };
 
 void ofxHistoryPlot::setDrawGuideValues(bool doIt){drawGuideValues = doIt;}
@@ -357,19 +376,19 @@ void ofxHistoryPlot::setBackgroundColor(const ofColor & c){ bgColor = c;}
 
 void ofxHistoryPlot::setDrawGrid(bool d) { drawGrid = d;}
 void ofxHistoryPlot::setGridColor(ofColor c){ gridColor = c;}
-void ofxHistoryPlot::setGridUnit(float g){gridUnit = g;}
+void ofxHistoryPlot::setGridUnit(float g){gridUnit = std::isfinite(g) ? std::max(1.0f, g) : 1.0f; gridNeedsRefresh = true;}
 
 
 void ofxHistoryPlot::setShowNumericalInfo(bool show){ showNumericalInfo = show;}
 void ofxHistoryPlot::setRespectBorders(bool respect){respectBorders = respect;}
-void ofxHistoryPlot::setDrawSkipVal(int skip){ drawSkip = skip; if (drawSkip < 1) drawSkip = 1;}
+void ofxHistoryPlot::setDrawSkipVal(int skip){ drawSkip = skip; if (drawSkip < 1) drawSkip = 1; plotNeedsRefresh = true;}
 void ofxHistoryPlot::setLineWidth(float w){ lineWidth = w;}
 void ofxHistoryPlot::setDrawBackground(bool d) { drawBackground = d;}
 void ofxHistoryPlot::setDrawTitle(bool doit){drawTitle = doit;}
 
-void ofxHistoryPlot::setShowSmoothedCurve(bool show){showSmoothedPlot = show;}
+void ofxHistoryPlot::setShowSmoothedCurve(bool show){showSmoothedPlot = show; plotNeedsRefresh = true;}
 void ofxHistoryPlot::setSmoothFilter(float filter){smoothFactor = filter;};
 
 void ofxHistoryPlot::setCropToRect(bool s){scissor = s;}
 
-std::deque<float>& ofxHistoryPlot::getValues(){ return values; }
+std::deque<float>& ofxHistoryPlot::getValues(){ valuesExposed = true; return values; }

@@ -134,6 +134,8 @@ private:
 	float		smoothFactor; //(0 1.0] >> 1.0 means no smoothing
 
 	bool 		plotNeedsRefresh;
+	bool 		gridNeedsRefresh;
+	bool 		valuesExposed;
 
 	ofVboMesh 	gridMesh;
 	ofVboMesh 	plotMesh;
